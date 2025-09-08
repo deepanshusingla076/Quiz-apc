@@ -32,6 +32,10 @@ public class Quiz {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", insertable = false, updatable = false)
     private User creator;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -55,6 +59,28 @@ public class Quiz {
 
     @Column(name = "active")
     private boolean active = true;
+    
+    // Additional fields from schema
+    @Column(name = "total_attempts", columnDefinition = "INT DEFAULT 0")
+    private Integer totalAttempts = 0;
+    
+    @Column(name = "average_score", columnDefinition = "DECIMAL(5,2) DEFAULT 0.00")
+    private Double averageScore = 0.0;
+    
+    @Column(name = "max_attempts")
+    private Integer maxAttempts;
+    
+    @Column(name = "passing_score")
+    private Integer passingScore;
+    
+    @Column(name = "show_correct_answers", columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean showCorrectAnswers = true;
+    
+    @Column(name = "randomize_questions", columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean randomizeQuestions = false;
+    
+    @Column(name = "instant_feedback", columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean instantFeedback = true;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Question> questions = new ArrayList<>();
@@ -130,6 +156,14 @@ public class Quiz {
     public void setCreator(User creator) {
         this.creator = creator;
     }
+    
+    public Category getCategory() {
+        return category;
+    }
+    
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
     public Difficulty getDifficulty() {
         return difficulty;
@@ -201,6 +235,77 @@ public class Quiz {
 
     public void setAttempts(List<QuizAttempt> attempts) {
         this.attempts = attempts;
+    }
+    
+    // Additional getters and setters
+    public Integer getTotalAttempts() {
+        return totalAttempts;
+    }
+    
+    public void setTotalAttempts(Integer totalAttempts) {
+        this.totalAttempts = totalAttempts;
+    }
+    
+    public Double getAverageScore() {
+        return averageScore;
+    }
+    
+    public void setAverageScore(Double averageScore) {
+        this.averageScore = averageScore;
+    }
+    
+    public Integer getMaxAttempts() {
+        return maxAttempts;
+    }
+    
+    public void setMaxAttempts(Integer maxAttempts) {
+        this.maxAttempts = maxAttempts;
+    }
+    
+    public Integer getPassingScore() {
+        return passingScore;
+    }
+    
+    public void setPassingScore(Integer passingScore) {
+        this.passingScore = passingScore;
+    }
+    
+    public Boolean getShowCorrectAnswers() {
+        return showCorrectAnswers;
+    }
+    
+    public void setShowCorrectAnswers(Boolean showCorrectAnswers) {
+        this.showCorrectAnswers = showCorrectAnswers;
+    }
+    
+    public Boolean getRandomizeQuestions() {
+        return randomizeQuestions;
+    }
+    
+    public void setRandomizeQuestions(Boolean randomizeQuestions) {
+        this.randomizeQuestions = randomizeQuestions;
+    }
+    
+    public Boolean getInstantFeedback() {
+        return instantFeedback;
+    }
+    
+    public void setInstantFeedback(Boolean instantFeedback) {
+        this.instantFeedback = instantFeedback;
+    }
+    
+    // Utility methods
+    public void incrementTotalAttempts() {
+        this.totalAttempts = (this.totalAttempts == null ? 0 : this.totalAttempts) + 1;
+    }
+    
+    public void updateAverageScore(double newScore) {
+        if (this.totalAttempts == null || this.totalAttempts == 0) {
+            this.averageScore = newScore;
+        } else {
+            double totalScore = this.averageScore * (this.totalAttempts - 1);
+            this.averageScore = (totalScore + newScore) / this.totalAttempts;
+        }
     }
 
     public int getQuestionCount() {

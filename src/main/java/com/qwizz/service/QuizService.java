@@ -152,4 +152,82 @@ public class QuizService {
         Optional<Quiz> quizOpt = findById(quizId);
         return quizOpt.isPresent() && quizOpt.get().getCreatorId().equals(userId);
     }
+    
+    // Enhanced methods for dashboard functionality
+    
+    public List<Quiz> getQuizzesByCategory(Long categoryId, int limit) {
+        List<Quiz> quizzes = quizRepository.findByCategoryIdAndIsPublicTrueAndActiveTrueOrderByCreatedAtDesc(categoryId);
+        return quizzes.size() > limit ? quizzes.subList(0, limit) : quizzes;
+    }
+    
+    public List<Quiz> getQuizzesByCategory(Long categoryId) {
+        return quizRepository.findByCategoryIdAndIsPublicTrueAndActiveTrueOrderByCreatedAtDesc(categoryId);
+    }
+    
+    public List<Quiz> getSuggestedQuizzes(Long userId, int limit) {
+        List<Quiz> quizzes = quizRepository.findQuizzesNotAttemptedByUser(userId);
+        return quizzes.size() > limit ? quizzes.subList(0, limit) : quizzes;
+    }
+    
+    public List<Quiz> getPopularQuizzes() {
+        return quizRepository.findPopularQuizzes();
+    }
+    
+    public List<Quiz> getHighestRatedQuizzes() {
+        return quizRepository.findHighestRatedQuizzes();
+    }
+    
+    public List<Quiz> getAIGeneratedQuizzes() {
+        return quizRepository.findByAiGeneratedTrueAndIsPublicTrueAndActiveTrue();
+    }
+    
+    public List<Quiz> getRecentQuizzes(LocalDateTime since) {
+        return quizRepository.findRecentQuizzes(since);
+    }
+    
+    public List<Quiz> searchQuizzesWithFilters(Long categoryId, Difficulty difficulty, String searchTerm) {
+        return quizRepository.findQuizzesWithFilters(categoryId, difficulty, searchTerm);
+    }
+    
+    public List<Quiz> getSimilarQuizzes(Quiz quiz, int limit) {
+        if (quiz.getCategory() == null) {
+            return List.of();
+        }
+        
+        int difficultyValue = quiz.getDifficulty().ordinal() + 1;
+        List<Quiz> similarQuizzes = quizRepository.findSimilarQuizzes(
+            quiz.getId(), 
+            quiz.getCategory().getId(), 
+            difficultyValue
+        );
+        
+        return similarQuizzes.size() > limit ? similarQuizzes.subList(0, limit) : similarQuizzes;
+    }
+    
+    public int getQuizCountByCategory(Long categoryId) {
+        return quizRepository.countByCategoryId(categoryId);
+    }
+    
+    public void updateQuizStatistics(Quiz quiz, double newScore) {
+        quiz.incrementTotalAttempts();
+        quiz.updateAverageScore(newScore);
+        quizRepository.save(quiz);
+    }
+    
+    public String findMostPopularQuizId(Long creatorId) {
+        List<Quiz> createdQuizzes = getQuizzesByCreator(creatorId);
+        if (createdQuizzes.isEmpty()) {
+            return "N/A";
+        }
+        
+        Quiz mostPopular = createdQuizzes.stream()
+                .max((q1, q2) -> {
+                    int attempts1 = q1.getTotalAttempts() != null ? q1.getTotalAttempts() : 0;
+                    int attempts2 = q2.getTotalAttempts() != null ? q2.getTotalAttempts() : 0;
+                    return Integer.compare(attempts1, attempts2);
+                })
+                .orElse(null);
+        
+        return mostPopular != null ? mostPopular.getTitle() : "N/A";
+    }
 }

@@ -1,466 +1,984 @@
 <!DOCTYPE html>
-<html lang="en" layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Teacher Dashboard - QWIZZ</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --primary: #FF6B35;
-      --secondary: #00D2FF;
-      --accent: #FFE66D;
-      --success: #00F5A0;
-      --warning: #FFB627;
-      --error: #FF5E5B;
-      --dark: #1A1B23;
-      --light: #F8F9FA;
-      --white: #FFFFFF;
-      --black: #000000;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - QWIZZ</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* =============================================
+           MODERN BRUTALIST THEME - QWIZZ TEACHER DASHBOARD
+           ============================================= */
+        :root {
+            --primary: #FF6B35;
+            --secondary: #FF3366;
+            --accent: #00D2FF;
+            --success: #00F5A0;
+            --warning: #FFE66D;
+            --purple: #9D4EDD;
+            --danger: #FF5E5B;
+            --dark: #1A1B23;
+            --light: #F8F9FA;
+            --white: #FFFFFF;
+            --black: #000000;
+            
+            --font-bold: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+            --font-regular: 'Arial', 'Helvetica Neue', sans-serif;
+            
+            --border-thick: 4px solid var(--black);
+            --border-thin: 2px solid var(--black);
+            --shadow-brutal: 8px 8px 0px var(--black);
+            --shadow-small: 4px 4px 0px var(--black);
+            --radius: 0px;
+            
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+        }
 
-      --border-thick: 4px solid var(--black);
-      --shadow-brutal: 8px 8px 0px var(--black);
-      --space-sm: 0.5rem;
-      --space-md: 1rem;
-      --space-lg: 1.5rem;
-      --space-xl: 2rem;
-      --font-primary: 'Arial Black', Arial, sans-serif;
-      --font-secondary: 'Arial', sans-serif;
-    }
+        /* =============================================
+           BASE STYLES - FULL HEIGHT SCROLLING
+           ============================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      margin: 0;
-      font-family: var(--font-secondary);
-      background: var(--light);
-      color: var(--dark);
-    }
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
 
-    /* Navbar */
-    .navbar {
-      background: var(--white);
-      border-bottom: var(--border-thick);
-      padding: var(--space-md) var(--space-xl);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow-brutal);
-    }
+        body {
+            font-family: var(--font-regular);
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            /* Enable smooth scrolling */
+            scroll-behavior: smooth;
+        }
 
-    .navbar h1 {
-      font-family: var(--font-primary);
-      font-size: 1.8rem;
-      color: var(--primary);
-      margin: 0;
-    }
+        /* =============================================
+           FLOATING LOGOUT BUTTON
+           ============================================= */
+        .floating-logout {
+            position: fixed;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            z-index: 1000;
+            background: var(--danger);
+            color: var(--white);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: var(--border-thick);
+            border-radius: 50px;
+            text-decoration: none;
+            font-family: var(--font-bold);
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-small);
+            transition: all 0.3s ease;
+        }
 
-    .navbar .profile {
-      font-weight: 700;
-    }
+        .floating-logout:hover {
+            background: var(--secondary);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+            text-decoration: none;
+            color: var(--white);
+        }
 
-    /* Layout */
-    .dashboard {
-      display: grid;
-      grid-template-columns: 250px 1fr;
-      min-height: calc(100vh - 70px);
-    }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
 
-    /* Sidebar */
-    .sidebar {
-      background: var(--white);
-      border-right: var(--border-thick);
-      padding: var(--space-lg);
-      box-shadow: var(--shadow-brutal);
-    }
+        /* =============================================
+           HERO SECTION
+           ============================================= */
+        .hero-section {
+            background: linear-gradient(135deg, var(--purple) 0%, var(--accent) 100%);
+            padding: var(--spacing-xl) 0;
+            position: relative;
+            overflow: hidden;
+            border-bottom: var(--border-thick);
+        }
 
-    .sidebar h2 {
-      font-family: var(--font-primary);
-      color: var(--secondary);
-      margin-bottom: var(--space-lg);
-      font-size: 1.4rem;
-    }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(45deg, 
+                    transparent, 
+                    transparent 20px, 
+                    rgba(0,0,0,0.1) 20px, 
+                    rgba(0,0,0,0.1) 40px);
+            animation: slide 4s linear infinite;
+        }
 
-    .sidebar a {
-      display: block;
-      padding: var(--space-sm) var(--space-md);
-      margin-bottom: var(--space-sm);
-      border: var(--border-thick);
-      text-decoration: none;
-      font-weight: 700;
-      color: var(--dark);
-      transition: 0.2s;
-      background: var(--white);
-    }
+        @keyframes slide {
+            0% { transform: translateX(-40px); }
+            100% { transform: translateX(0px); }
+        }
 
-    .sidebar a:hover {
-      background: var(--accent);
-      transform: translate(-4px, -4px);
-      box-shadow: var(--shadow-brutal);
-    }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+        }
 
-    /* Main */
-    .main {
-      padding: var(--space-xl);
-    }
+        .hero-title {
+            font-family: var(--font-bold);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: var(--spacing-sm);
+            text-shadow: 4px 4px 0px var(--black);
+            letter-spacing: 2px;
+        }
 
-    .section-title {
-      font-family: var(--font-primary);
-      margin-bottom: var(--space-lg);
-      font-size: 1.5rem;
-      color: var(--primary);
-    }
+        .hero-subtitle {
+            font-family: var(--font-bold);
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0px var(--black);
+            opacity: 0.9;
+        }
 
-    /* Grid Cards */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: var(--space-xl);
-    }
+        /* =============================================
+           QUICK ACTIONS
+           ============================================= */
+        .quick-actions {
+            padding: var(--spacing-lg) 0;
+            background: var(--white);
+            border-bottom: var(--border-thick);
+        }
 
-    .card {
-      background: var(--white);
-      border: var(--border-thick);
-      padding: var(--space-lg);
-      box-shadow: var(--shadow-brutal);
-      transition: 0.2s;
-    }
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+        }
 
-    .card:hover {
-      transform: translate(-4px, -4px);
-      background: var(--accent);
-    }
+        .action-card {
+            background: var(--warning);
+            border: var(--border-thick);
+            padding: var(--spacing-lg);
+            text-align: center;
+            transform: rotate(-1deg);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-brutal);
+            text-decoration: none;
+            color: var(--black);
+        }
 
-    .card h3 {
-      font-family: var(--font-primary);
-      font-size: 1.2rem;
-      margin-bottom: var(--space-md);
-    }
+        .action-card:nth-child(2n) {
+            background: var(--success);
+            transform: rotate(1deg);
+        }
 
-    .card p {
-      font-size: 1rem;
-    }
+        .action-card:nth-child(3n) {
+            background: var(--accent);
+            transform: rotate(-0.5deg);
+        }
 
-    /* Table */
-    .table-container {
-      margin-top: var(--space-xl);
-      overflow-x: auto;
-    }
+        .action-card:hover {
+            transform: rotate(0deg) scale(1.05);
+            box-shadow: 12px 12px 0px var(--black);
+            text-decoration: none;
+            color: var(--black);
+        }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      border: var(--border-thick);
-    }
+        .action-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-md);
+            font-size: 2rem;
+            background: var(--black);
+            color: var(--white);
+            border: var(--border-thin);
+            box-shadow: var(--shadow-small);
+        }
 
-    th, td {
-      padding: var(--space-md);
-      border: var(--border-thick);
-      text-align: left;
-    }
+        .action-title {
+            font-family: var(--font-bold);
+            font-size: 1.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: var(--spacing-xs);
+        }
 
-    th {
-      background: var(--primary);
-      color: var(--white);
-      font-family: var(--font-primary);
-    }
+        .action-desc {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
 
-    tr:nth-child(even) {
-      background: var(--light);
-    }
+        /* =============================================
+           STATS GRID
+           ============================================= */
+        .stats-section {
+            padding: var(--spacing-xl) 0;
+        }
 
-    /* Buttons */
-    .btn {
-      display: inline-block;
-      padding: var(--space-sm) var(--space-md);
-      border: var(--border-thick);
-      font-weight: 900;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: 0.2s;
-    }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
 
-    .btn-primary {
-      background: var(--primary);
-      color: var(--white);
-    }
+        .stat-card {
+            background: var(--white);
+            border: var(--border-thick);
+            padding: var(--spacing-lg);
+            text-align: center;
+            box-shadow: var(--shadow-brutal);
+            position: relative;
+            transform: rotate(-1deg);
+            transition: all 0.3s ease;
+        }
 
-    .btn-primary:hover {
-      background: var(--accent);
-      color: var(--black);
-      transform: translate(-3px, -3px);
-      box-shadow: var(--shadow-brutal);
-    }
+        .stat-card:nth-child(2n) {
+            transform: rotate(1deg);
+        }
 
-    /* Additional Styles for Dashboard */
-    .welcome-section {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: white;
-      padding: var(--space-xl);
-      border-radius: 12px;
-      margin-bottom: var(--space-xl);
-      text-align: center;
-      border: var(--border-thick);
-    }
+        .stat-card:hover {
+            transform: rotate(0deg) scale(1.05);
+            box-shadow: 12px 12px 0px var(--black);
+            z-index: 10;
+        }
 
-    .welcome-section h1 {
-      margin-bottom: 10px;
-      font-weight: 300;
-    }
+        .stat-card.quizzes { background: var(--warning); }
+        .stat-card.students { background: var(--success); }
+        .stat-card.score { background: var(--accent); }
+        .stat-card.popular { background: var(--purple); }
 
-    .quick-actions {
-      margin-bottom: var(--space-xl);
-    }
+        .stat-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-md);
+            font-size: 2rem;
+            background: var(--black);
+            color: var(--white);
+            border: var(--border-thin);
+            box-shadow: var(--shadow-small);
+        }
 
-    .card-number {
-      font-size: 2.5rem;
-      font-weight: bold;
-      margin: 10px 0;
-      color: var(--primary);
-    }
+        .stat-number {
+            font-family: var(--font-bold);
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--black);
+            margin-bottom: var(--spacing-xs);
+            text-shadow: 2px 2px 0px rgba(255,255,255,0.8);
+        }
 
-    .badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      font-weight: bold;
-    }
+        .stat-label {
+            font-family: var(--font-bold);
+            font-size: 1rem;
+            color: var(--black);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-    .bg-success { background-color: var(--success) !important; color: white; }
-    .bg-warning { background-color: var(--warning) !important; color: black; }
-    .bg-danger { background-color: var(--error) !important; color: white; }
+        /* =============================================
+           MAIN CONTENT GRID
+           ============================================= */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
 
-    .empty-state {
-      padding: var(--space-xl);
-      text-align: center;
-    }
+        .content-section {
+            background: var(--white);
+            border: var(--border-thick);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-brutal);
+            transform: rotate(-0.5deg);
+        }
 
-    .activity-item {
-      display: flex;
-      align-items: flex-start;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--light);
-    }
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
 
-    .activity-item i {
-      margin-right: 10px;
-      margin-top: 2px;
-    }
+        .sidebar-card {
+            background: var(--white);
+            border: var(--border-thick);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-brutal);
+            transform: rotate(0.5deg);
+            transition: all 0.3s ease;
+        }
 
-    .activity-item:last-child {
-      border-bottom: none;
-    }
+        .sidebar-card:hover {
+            transform: rotate(0deg);
+        }
 
-    .btn-sm {
-      padding: 4px 8px;
-      font-size: 0.8rem;
-    }
+        .section-title {
+            font-family: var(--font-bold);
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--black);
+            margin-bottom: var(--spacing-lg);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
 
-    .btn-outline-primary,
-    .btn-outline-secondary,
-    .btn-outline-info,
-    .btn-outline-success {
-      border: 2px solid;
-      background: transparent;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 40px;
+            background: var(--purple);
+            border: 2px solid var(--black);
+            box-shadow: var(--shadow-small);
+        }
 
-    .btn-outline-primary {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
+        /* =============================================
+           QUIZ CARDS
+           ============================================= */
+        .quiz-grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
 
-    .btn-outline-secondary {
-      border-color: var(--dark);
-      color: var(--dark);
-    }
+        .quiz-card {
+            border: var(--border-thick);
+            padding: var(--spacing-lg);
+            background: var(--light);
+            position: relative;
+            transform: rotate(0.5deg);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-small);
+        }
 
-    .btn-outline-info {
-      border-color: var(--secondary);
-      color: var(--secondary);
-    }
+        .quiz-card:hover {
+            transform: rotate(0deg) translateY(-4px);
+            box-shadow: var(--shadow-brutal);
+            background: var(--white);
+        }
 
-    .btn-outline-success {
-      border-color: var(--success);
-      color: var(--success);
-    }
-  </style>
+        .quiz-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            height: 8px;
+            background: var(--purple);
+            border: 2px solid var(--black);
+        }
+
+        .quiz-title {
+            font-family: var(--font-bold);
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--black);
+            margin-bottom: var(--spacing-sm);
+            text-transform: uppercase;
+        }
+
+        .quiz-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            font-weight: 700;
+            color: var(--dark);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .quiz-description {
+            color: var(--dark);
+            margin-bottom: var(--spacing-md);
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .quiz-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-family: var(--font-bold);
+            font-weight: 900;
+            text-decoration: none;
+            text-transform: uppercase;
+            border: var(--border-thin);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            box-shadow: var(--shadow-small);
+            font-size: 0.9rem;
+            border-radius: var(--radius);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--black);
+        }
+
+        .btn-secondary:hover {
+            background: var(--warning);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .btn-info {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        .btn-info:hover {
+            background: var(--purple);
+            color: var(--white);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        /* =============================================
+           DIFFICULTY BADGES
+           ============================================= */
+        .difficulty-badge {
+            display: inline-block;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border: var(--border-thin);
+            font-size: 0.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-family: var(--font-bold);
+            box-shadow: var(--shadow-small);
+        }
+
+        .difficulty-easy {
+            background: var(--success);
+            color: var(--black);
+        }
+
+        .difficulty-medium {
+            background: var(--warning);
+            color: var(--black);
+        }
+
+        .difficulty-hard {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        /* =============================================
+           ACTIVITY LIST
+           ============================================= */
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            padding: var(--spacing-md) 0;
+            border-bottom: var(--border-thin);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.2rem;
+            border: var(--border-thin);
+            box-shadow: var(--shadow-small);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 900;
+            color: var(--black);
+            margin-bottom: var(--spacing-xs);
+            font-family: var(--font-bold);
+            text-transform: uppercase;
+        }
+
+        .activity-time {
+            color: var(--dark);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        /* =============================================
+           EMPTY STATES
+           ============================================= */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--dark);
+            font-family: var(--font-bold);
+            text-transform: uppercase;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--purple);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        /* =============================================
+           RESPONSIVE DESIGN
+           ============================================= */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-lg);
+            }
+            
+            .content-section,
+            .sidebar-card {
+                transform: rotate(0deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid,
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--spacing-md);
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .quiz-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .container {
+                padding: 0 var(--spacing-sm);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid,
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* =============================================
+           UTILITY CLASSES
+           ============================================= */
+        .text-center { text-align: center; }
+        .text-uppercase { text-transform: uppercase; }
+        .font-bold { font-family: var(--font-bold); font-weight: 900; }
+        .mb-1 { margin-bottom: var(--spacing-xs); }
+        .mb-2 { margin-bottom: var(--spacing-sm); }
+        .mb-3 { margin-bottom: var(--spacing-md); }
+        .mb-4 { margin-bottom: var(--spacing-lg); }
+    </style>
 </head>
+
 <body>
-  <div layout:fragment="content">
-    <!-- Welcome Section -->
-    <div class="welcome-section">
-      <h1>Welcome back, <span th:text="${teacher.firstName}">Teacher</span>!</h1>
-      <p>Manage your quizzes, track student progress, and create engaging assessments.</p>
-    </div>
+    <!-- Floating Logout Button -->
+    <a href="/logout" class="floating-logout">
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
+    </a>
 
-    <!-- Quick Actions -->
-    <div class="quick-actions mb-4">
-      <a th:href="@{/teacher/quiz/create}" class="btn btn-primary me-3">
-        <i class="fas fa-plus"></i> Create New Quiz
-      </a>
-      <a th:href="@{/teacher/quizzes}" class="btn btn-secondary me-3">
-        <i class="fas fa-list"></i> Manage Quizzes
-      </a>
-      <a th:href="@{/teacher/students}" class="btn btn-info">
-        <i class="fas fa-users"></i> View Students
-      </a>
-    </div>
-
-    <!-- Analytics Dashboard -->
-    <div class="row mb-4">
-      <div class="col-md-3">
-        <div class="card">
-          <h3><i class="fas fa-clipboard-list"></i> Total Quizzes</h3>
-          <p class="card-number" th:text="${analytics?.totalQuizzesCreated ?: 0}">0</p>
-          <small>Quizzes created</small>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card">
-          <h3><i class="fas fa-users"></i> Active Students</h3>
-          <p class="card-number" th:text="${analytics?.totalStudentAttempts ?: 0}">0</p>
-          <small>Student attempts</small>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card">
-          <h3><i class="fas fa-chart-line"></i> Avg Score</h3>
-          <p class="card-number" th:text="${analytics?.averageQuizScore != null ? #numbers.formatDecimal(analytics.averageQuizScore, 1, 1) + '%' : '0%'}">0%</p>
-          <small>Class average</small>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card">
-          <h3><i class="fas fa-clipboard-check"></i> Popular Quiz</h3>
-          <p class="card-number" th:text="${analytics?.mostPopularQuizId ?: 0}">0</p>
-          <small>Most attempted</small>
-        </div>
-      </div>
-    </div>
-
-    <!-- Recent Quizzes -->
-    <div class="row">
-      <div class="col-md-8">
-        <h2 class="section-title">Recent Quizzes</h2>
-        <div th:if="${recentQuizzes != null and !recentQuizzes.empty}">
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Quiz Title</th>
-                  <th>Questions</th>
-                  <th>Difficulty</th>
-                  <th>Created</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="quiz : ${recentQuizzes}">
-                  <td>
-                    <strong th:text="${quiz.title}">Quiz Title</strong><br>
-                    <small th:text="${quiz.description}" class="text-muted">Quiz description</small>
-                  </td>
-                  <td th:text="${quiz.questions?.size() ?: 0}">0</td>
-                  <td>
-                    <span class="badge" 
-                          th:classappend="${quiz.difficulty?.toString()?.toLowerCase() == 'easy' ? 'bg-success' : 
-                                           quiz.difficulty?.toString()?.toLowerCase() == 'medium' ? 'bg-warning' : 'bg-danger'}"
-                          th:text="${quiz.difficulty}">Medium</span>
-                  </td>
-                  <td th:text="${#temporals.format(quiz.createdAt, 'MMM dd, yyyy')}">Date</td>
-                  <td>
-                    <a th:href="@{/teacher/quiz/{id}/questions(id=${quiz.id})}" class="btn btn-sm btn-secondary me-1">
-                      <i class="fas fa-edit"></i>
-                    </a>
-                    <a th:href="@{/teacher/quiz/{id}/results(id=${quiz.id})}" class="btn btn-sm btn-info">
-                      <i class="fas fa-chart-bar"></i>
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div th:if="${recentQuizzes == null or recentQuizzes.empty}" class="empty-state">
-          <div class="card text-center">
-            <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
-            <h4>No Quizzes Yet</h4>
-            <p>Create your first quiz to get started!</p>
-            <a th:href="@{/teacher/quiz/create}" class="btn btn-primary">
-              <i class="fas fa-plus"></i> Create Quiz
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Stats Sidebar -->
-      <div class="col-md-4">
-        <h2 class="section-title">Quick Actions</h2>
-        <div class="card mb-3">
-          <h4><i class="fas fa-plus-circle"></i> Create Content</h4>
-          <div class="d-grid gap-2">
-            <a th:href="@{/teacher/quiz/create}" class="btn btn-outline-primary">
-              <i class="fas fa-plus"></i> New Quiz
-            </a>
-            <a th:href="@{/teacher/quizzes}" class="btn btn-outline-secondary">
-              <i class="fas fa-cog"></i> Manage Quizzes
-            </a>
-          </div>
-        </div>
-
-        <div class="card mb-3">
-          <h4><i class="fas fa-chart-pie"></i> Analytics</h4>
-          <div class="d-grid gap-2">
-            <a th:href="@{/teacher/students}" class="btn btn-outline-info">
-              <i class="fas fa-users"></i> Student Progress
-            </a>
-            <button class="btn btn-outline-success" onclick="generateReport()">
-              <i class="fas fa-download"></i> Export Report
-            </button>
-          </div>
-        </div>
-
-        <div class="card">
-          <h4><i class="fas fa-bell"></i> Recent Quizzes</h4>
-          <div th:if="${recentQuizzes != null and !#lists.isEmpty(recentQuizzes)}">
-            <div class="activity-item" th:each="quiz : ${recentQuizzes}">
-              <i class="fas fa-clipboard-list text-primary"></i>
-              <div>
-                <strong th:text="${quiz.title}">Quiz Title</strong> 
-                <span th:text="${quiz.difficulty}">MEDIUM</span>
-                <br><small th:text="${#temporals.format(quiz.createdAt, 'MMM dd, yyyy')}" class="text-muted">Created date</small>
-              </div>
+    <!-- =============================================
+         HERO SECTION
+         ============================================= -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Welcome, Professor <span th:text="${teacher?.firstName ?: 'Teacher'}">John</span>!
+                </h1>
+                <p class="hero-subtitle">Shape Minds, Create Knowledge</p>
             </div>
-          </div>
-          <div th:if="${recentQuizzes == null or #lists.isEmpty(recentQuizzes)}">
-            <p class="text-muted text-center">No quizzes created yet</p>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
+    </section>
 
-  <script layout:fragment="scripts">
-    // Analytics animation
-    document.addEventListener('DOMContentLoaded', function() {
-      const numbers = document.querySelectorAll('.card-number');
-      numbers.forEach(num => {
-        const value = parseInt(num.textContent) || 0;
-        let current = 0;
-        const increment = Math.ceil(value / 20);
-        const timer = setInterval(() => {
-          current += increment;
-          if (current >= value) {
-            current = value;
-            clearInterval(timer);
-          }
-          num.textContent = current + (num.textContent.includes('%') ? '%' : '');
-        }, 50);
-      });
-    });
+    <!-- =============================================
+         QUICK ACTIONS
+         ============================================= -->
+    <section class="quick-actions">
+        <div class="container">
+            <div class="actions-grid">
+                <a href="/teacher/quiz/create" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="action-title">Create Quiz</div>
+                    <div class="action-desc">Build engaging assessments</div>
+                </a>
 
-    function generateReport() {
-      // Placeholder for report generation
-      alert('Report generation feature coming soon!');
-    }
-  </script>
+                <a href="/teacher/quizzes" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="action-title">Manage Quizzes</div>
+                    <div class="action-desc">Edit and organize content</div>
+                </a>
+
+                <a href="/teacher/students" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="action-title">View Students</div>
+                    <div class="action-desc">Track student progress</div>
+                </a>
+
+                <a href="/teacher/analytics" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="action-title">Analytics</div>
+                    <div class="action-desc">Performance insights</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         STATS SECTION
+         ============================================= -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card quizzes">
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="stat-number" th:text="${analytics?.totalQuizzesCreated ?: 0}">5</div>
+                    <div class="stat-label">Quizzes Created</div>
+                </div>
+
+                <div class="stat-card students">
+                    <div class="stat-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="stat-number" th:text="${analytics?.totalStudentAttempts ?: 0}">42</div>
+                    <div class="stat-label">Student Attempts</div>
+                </div>
+
+                <div class="stat-card score">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-number" th:text="${analytics?.averageQuizScore != null ? #numbers.formatDecimal(analytics.averageQuizScore, 1, 1) + '%' : '0%'}">78%</div>
+                    <div class="stat-label">Class Average</div>
+                </div>
+
+                <div class="stat-card popular">
+                    <div class="stat-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-number" th:text="${analytics?.mostPopularQuizId ?: 0}">3</div>
+                    <div class="stat-label">Most Popular Quiz</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         MAIN CONTENT
+         ============================================= -->
+    <section class="main-content-section">
+        <div class="container">
+            <div class="main-content">
+                <!-- Quiz Management -->
+                <div class="content-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-bookmark"></i>
+                        Your Quizzes
+                    </h2>
+
+                    <div class="quiz-grid">
+                        <!-- Empty State -->
+                        <div th:if="${#lists.isEmpty(recentQuizzes)}" class="empty-state">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h3>No Quizzes Created Yet</h3>
+                            <p>Start building your first quiz!</p>
+                            <a href="/teacher/quiz/create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Create Quiz
+                            </a>
+                        </div>
+
+                        <!-- Quiz Cards -->
+                        <div th:each="quiz : ${recentQuizzes}" class="quiz-card">
+                            <h3 class="quiz-title" th:text="${quiz.title}">Java Fundamentals</h3>
+                            
+                            <div class="quiz-meta">
+                                <span>
+                                    <i class="fas fa-question-circle"></i>
+                                    <span th:text="${quiz.questions?.size() ?: 0} + ' questions'">5 questions</span>
+                                </span>
+                                <span th:class="'difficulty-badge difficulty-' + ${quiz.difficulty != null ? quiz.difficulty.toString().toLowerCase() : 'medium'}" 
+                                      th:text="${quiz.difficulty ?: 'MEDIUM'}">MEDIUM</span>
+                            </div>
+
+                            <p class="quiz-description" th:text="${quiz.description}">
+                                Master the fundamentals of Java programming including object-oriented concepts and core syntax.
+                            </p>
+
+                            <div class="quiz-actions">
+                                <a th:href="@{/teacher/quiz/{id}/edit(id=${quiz.id})}" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                    Edit Quiz
+                                </a>
+                                <a th:href="@{/teacher/quiz/{id}/results(id=${quiz.id})}" class="btn btn-info">
+                                    <i class="fas fa-chart-bar"></i>
+                                    Results
+                                </a>
+                                <a th:href="@{/teacher/quiz/{id}/preview(id=${quiz.id})}" class="btn btn-secondary">
+                                    <i class="fas fa-eye"></i>
+                                    Preview
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="sidebar-section">
+                    <!-- Class Performance Card -->
+                    <div class="sidebar-card">
+                        <h3 class="section-title">
+                            <i class="fas fa-trophy"></i>
+                            Class Performance
+                        </h3>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Highest Score</div>
+                                <div class="activity-time">95% on Java Fundamentals</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Fastest Completion</div>
+                                <div class="activity-time">8 minutes on HTML Basics</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Most Active</div>
+                                <div class="activity-time">42 attempts this week</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Card -->
+                    <div class="sidebar-card">
+                        <h3 class="section-title">
+                            <i class="fas fa-bell"></i>
+                            Recent Activity
+                        </h3>
+                        
+                        <ul class="activity-list">
+                            <!-- Static activity items for demo -->
+                            <li class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">New Student Registered</div>
+                                    <div class="activity-time">Sarah completed Java Quiz</div>
+                                </div>
+                            </li>
+                            
+                            <li class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">High Score Achieved</div>
+                                    <div class="activity-time">Mike got 98% on SQL Quiz</div>
+                                </div>
+                            </li>
+
+                            <li class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-plus-circle"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Quiz Created</div>
+                                    <div class="activity-time">Data Structures quiz added</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Quick Tools Card -->
+                    <div class="sidebar-card">
+                        <h3 class="section-title">
+                            <i class="fas fa-tools"></i>
+                            Quick Tools
+                        </h3>
+                        
+                        <div style="display: grid; gap: var(--spacing-sm);">
+                            <a href="/teacher/quiz/import" class="btn btn-secondary">
+                                <i class="fas fa-upload"></i>
+                                Import Questions
+                            </a>
+                            <a href="/teacher/reports/generate" class="btn btn-info">
+                                <i class="fas fa-download"></i>
+                                Export Report
+                            </a>
+                            <a href="/teacher/settings" class="btn btn-primary">
+                                <i class="fas fa-cog"></i>
+                                Settings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Animate stat numbers on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(num => {
+                const finalValue = num.textContent;
+                const isPercentage = finalValue.includes('%');
+                const numericValue = parseInt(finalValue.replace('%', '')) || 0;
+                
+                let currentValue = 0;
+                const increment = Math.ceil(numericValue / 30);
+                
+                const counter = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= numericValue) {
+                        currentValue = numericValue;
+                        clearInterval(counter);
+                    }
+                    num.textContent = currentValue + (isPercentage ? '%' : '');
+                }, 50);
+            });
+
+            // Add hover effects to stat cards
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'rotate(0deg) scale(1.05)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    const isEven = index % 2 === 1;
+                    this.style.transform = isEven ? 'rotate(1deg)' : 'rotate(-1deg)';
+                });
+            });
+
+            // Add click animation to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // Update greeting based on time
+            function updateGreeting() {
+                const hour = new Date().getHours();
+                const teacherName = document.querySelector('.hero-title span').textContent;
+                const heroTitle = document.querySelector('.hero-title');
+                
+                let greeting = 'Welcome';
+                if (hour < 12) greeting = 'Good Morning';
+                else if (hour < 18) greeting = 'Good Afternoon';
+                else greeting = 'Good Evening';
+                
+                heroTitle.innerHTML = `${greeting}, Professor <span>${teacherName}</span>!`;
+            }
+
+            updateGreeting();
+            setInterval(updateGreeting, 60000); // Update every minute
+        });
+
+        // Sample function for generating reports
+        function generateReport() {
+            alert('Report generation feature coming soon!');
+        }
+    </script>
 </body>
 </html>

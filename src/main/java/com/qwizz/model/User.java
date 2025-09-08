@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -53,6 +54,54 @@ public class User implements UserDetails {
 
     @Column(name = "active")
     private boolean active = true;
+
+    // Extended profile fields
+    @Column(name = "profile_picture", length = 255)
+    private String profilePicture;
+    
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+    
+    @Column(name = "date_of_birth")
+    private java.sql.Date dateOfBirth;
+    
+    @Column(length = 20)
+    private String phone;
+    
+    @Column(length = 100)
+    private String location;
+    
+    // Game statistics
+    @Column(name = "total_points", columnDefinition = "INT DEFAULT 0")
+    private Integer totalPoints = 0;
+    
+    @Column(name = "quiz_streak", columnDefinition = "INT DEFAULT 0")
+    private Integer quizStreak = 0;
+    
+    @Column(name = "total_quizzes_taken", columnDefinition = "INT DEFAULT 0")
+    private Integer totalQuizzesTaken = 0;
+    
+    @Column(name = "total_quizzes_created", columnDefinition = "INT DEFAULT 0")
+    private Integer totalQuizzesCreated = 0;
+    
+    @Column(name = "average_score", columnDefinition = "DECIMAL(5,2) DEFAULT 0.00")
+    private Double averageScore = 0.0;
+    
+    @Column(name = "email_verified", columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean emailVerified = false;
+    
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin;
+    
+    // Relationships
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Quiz> createdQuizzes;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<QuizAttempt> quizAttempts;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UserAchievement> userAchievements;
 
     // Constructors
     public User() {
@@ -198,6 +247,151 @@ public class User implements UserDetails {
 
     public boolean isStudent() {
         return role == Role.STUDENT;
+    }
+    
+    // Extended profile getters and setters
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+    
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+    
+    public String getBio() {
+        return bio;
+    }
+    
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+    
+    public java.sql.Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+    
+    public void setDateOfBirth(java.sql.Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+    
+    public String getPhone() {
+        return phone;
+    }
+    
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+    
+    public String getLocation() {
+        return location;
+    }
+    
+    public void setLocation(String location) {
+        this.location = location;
+    }
+    
+    // Game statistics getters and setters
+    public Integer getTotalPoints() {
+        return totalPoints;
+    }
+    
+    public void setTotalPoints(Integer totalPoints) {
+        this.totalPoints = totalPoints;
+    }
+    
+    public Integer getQuizStreak() {
+        return quizStreak;
+    }
+    
+    public void setQuizStreak(Integer quizStreak) {
+        this.quizStreak = quizStreak;
+    }
+    
+    public Integer getTotalQuizzesTaken() {
+        return totalQuizzesTaken;
+    }
+    
+    public void setTotalQuizzesTaken(Integer totalQuizzesTaken) {
+        this.totalQuizzesTaken = totalQuizzesTaken;
+    }
+    
+    public Integer getTotalQuizzesCreated() {
+        return totalQuizzesCreated;
+    }
+    
+    public void setTotalQuizzesCreated(Integer totalQuizzesCreated) {
+        this.totalQuizzesCreated = totalQuizzesCreated;
+    }
+    
+    public Double getAverageScore() {
+        return averageScore;
+    }
+    
+    public void setAverageScore(Double averageScore) {
+        this.averageScore = averageScore;
+    }
+    
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+    
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+    
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
+    }
+    
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+    
+    // Relationship getters and setters
+    public List<Quiz> getCreatedQuizzes() {
+        return createdQuizzes;
+    }
+    
+    public void setCreatedQuizzes(List<Quiz> createdQuizzes) {
+        this.createdQuizzes = createdQuizzes;
+    }
+    
+    public List<QuizAttempt> getQuizAttempts() {
+        return quizAttempts;
+    }
+    
+    public void setQuizAttempts(List<QuizAttempt> quizAttempts) {
+        this.quizAttempts = quizAttempts;
+    }
+    
+    public List<UserAchievement> getUserAchievements() {
+        return userAchievements;
+    }
+    
+    public void setUserAchievements(List<UserAchievement> userAchievements) {
+        this.userAchievements = userAchievements;
+    }
+    
+    // Utility methods
+    public void incrementQuizzesTaken() {
+        this.totalQuizzesTaken = (this.totalQuizzesTaken == null ? 0 : this.totalQuizzesTaken) + 1;
+    }
+    
+    public void incrementQuizzesCreated() {
+        this.totalQuizzesCreated = (this.totalQuizzesCreated == null ? 0 : this.totalQuizzesCreated) + 1;
+    }
+    
+    public void addPoints(int points) {
+        this.totalPoints = (this.totalPoints == null ? 0 : this.totalPoints) + points;
+    }
+    
+    public void updateAverageScore(double newScore) {
+        if (this.totalQuizzesTaken == null || this.totalQuizzesTaken == 0) {
+            this.averageScore = newScore;
+        } else {
+            double totalScore = this.averageScore * (this.totalQuizzesTaken - 1);
+            this.averageScore = (totalScore + newScore) / this.totalQuizzesTaken;
+        }
     }
 
     @Override

@@ -83,9 +83,8 @@ public class AuthController {
 
             // Redirect based on role
             return switch (user.getRole()) {
-                case TEACHER -> "redirect:/teacher/dashboard";
-                case STUDENT -> "redirect:/student/dashboard";
-                default -> "redirect:/dashboard"; // Fallback for any other roles
+                case TEACHER -> "redirect:/dashboard?role=teacher";
+                case STUDENT -> "redirect:/dashboard?role=student";
             };
 
         } catch (Exception e) {
@@ -163,19 +162,7 @@ public class AuthController {
         return "redirect:/";
     }
 
-    // Dashboard redirect based on role
-    @GetMapping("/dashboard")
-    public String dashboard(Authentication authentication) {
-        if (authentication != null && authentication.isAuthenticated()) {
-            User user = (User) authentication.getPrincipal();
-            return switch (user.getRole()) {
-                case TEACHER -> "redirect:/teacher/dashboard";
-                case STUDENT -> "redirect:/student/dashboard";
-                default -> "redirect:/dashboard"; // Fallback for any other roles
-            };
-        }
-        return "redirect:/login";
-    }
+
 
     // REST API endpoints for JWT authentication
     @PostMapping("/api/auth/login")

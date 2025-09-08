@@ -124,4 +124,71 @@ public class QuizAttemptService {
     public void deleteAttempt(Long attemptId) {
         quizAttemptRepository.deleteById(attemptId);
     }
+    
+    // Enhanced methods for dashboard functionality
+    
+    public List<QuizAttempt> getRecentAttemptsByUser(Long userId, int limit) {
+        LocalDateTime since = LocalDateTime.now().minusDays(30); // Last 30 days
+        List<QuizAttempt> attempts = quizAttemptRepository.findByUser_IdAndStartTimeAfterOrderByStartTimeDesc(userId, since);
+        return attempts.size() > limit ? attempts.subList(0, limit) : attempts;
+    }
+    
+    public List<QuizAttempt> getAttemptsByUserSince(Long userId, LocalDateTime since) {
+        return quizAttemptRepository.findByUser_IdAndStartTimeAfterOrderByStartTimeDesc(userId, since);
+    }
+    
+    public List<QuizAttempt> getRecentAttemptsByQuizCreator(Long creatorId, int limit) {
+        List<QuizAttempt> attempts = quizAttemptRepository.findByQuizCreatorIdOrderByStartTimeDesc(creatorId);
+        return attempts.size() > limit ? attempts.subList(0, limit) : attempts;
+    }
+    
+    public Optional<QuizAttempt> getBestAttemptByUserAndQuiz(Long userId, Long quizId) {
+        return quizAttemptRepository.findBestAttemptByUserAndQuiz(userId, quizId);
+    }
+    
+    public Double getAverageScoreByUser(Long userId) {
+        return quizAttemptRepository.getAverageScoreByUser(userId);
+    }
+    
+    public Double getCompletionRateByUser(Long userId) {
+        return quizAttemptRepository.getCompletionRateByUser(userId);
+    }
+    
+    public List<QuizAttempt> getAttemptsInTimeRange(LocalDateTime start, LocalDateTime end) {
+        return quizAttemptRepository.findByStartTimeBetweenOrderByStartTimeDesc(start, end);
+    }
+    
+    public List<QuizAttempt> getHighScoreAttempts(Double minPercentage, int limit) {
+        List<QuizAttempt> attempts = quizAttemptRepository.findHighScoreAttempts(minPercentage);
+        return attempts.size() > limit ? attempts.subList(0, limit) : attempts;
+    }
+    
+    public Object[] getQuizStatistics(Long quizId) {
+        return quizAttemptRepository.getQuizStatistics(quizId);
+    }
+    
+    public List<QuizAttempt> getFastestCompletions(int limit) {
+        List<QuizAttempt> attempts = quizAttemptRepository.findFastestCompletions();
+        return attempts.size() > limit ? attempts.subList(0, limit) : attempts;
+    }
+    
+    public Integer getUserRankInQuiz(Long userId, Long quizId) {
+        return quizAttemptRepository.findUserRankInQuiz(userId, quizId);
+    }
+    
+    public int countCompletedAttemptsByCategory(Long categoryId) {
+        return quizAttemptRepository.countCompletedAttemptsByCategory(categoryId);
+    }
+    
+    public List<QuizAttempt> getQuizAttemptsForAnalytics(Long quizId, LocalDateTime since) {
+        return quizAttemptRepository.findQuizAttemptsForAnalytics(quizId, since);
+    }
+    
+    public List<QuizAttempt> getCompletedAttemptsByUserOrderByEndTime(Long userId) {
+        return quizAttemptRepository.findCompletedAttemptsByUserOrderByEndTime(userId);
+    }
+    
+    public int getTotalAttemptsForCreatedQuizzes(Long creatorId) {
+        return quizAttemptRepository.countAttemptsByCreatorId(creatorId);
+    }
 }

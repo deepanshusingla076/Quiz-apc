@@ -51,6 +51,24 @@ public class Question {
 
     @Column(name = "active")
     private boolean active = true;
+    
+    // Additional fields from schema
+    @Column(name = "explanation", columnDefinition = "TEXT")
+    private String explanation;
+    
+    @Column(name = "difficulty_level")
+    @Enumerated(EnumType.STRING)
+    private Difficulty difficultyLevel;
+    
+    @Column(name = "time_limit")
+    private Integer timeLimit; // in seconds
+    
+    @Column(name = "question_order")
+    private Integer questionOrder;
+    
+    // Relationships
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Answer> answers;
 
     // Constructors
     public Question() {
@@ -180,6 +198,47 @@ public class Question {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+    
+    // Additional getters and setters
+    public String getExplanation() {
+        return explanation;
+    }
+    
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
+    }
+    
+    public Difficulty getDifficultyLevel() {
+        return difficultyLevel;
+    }
+    
+    public void setDifficultyLevel(Difficulty difficultyLevel) {
+        this.difficultyLevel = difficultyLevel;
+    }
+    
+    public Integer getTimeLimit() {
+        return timeLimit;
+    }
+    
+    public void setTimeLimit(Integer timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+    
+    public Integer getQuestionOrder() {
+        return questionOrder;
+    }
+    
+    public void setQuestionOrder(Integer questionOrder) {
+        this.questionOrder = questionOrder;
+    }
+    
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+    
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
     }
 
     public boolean isMultipleChoice() {

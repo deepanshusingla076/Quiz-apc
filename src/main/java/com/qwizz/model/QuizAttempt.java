@@ -6,6 +6,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.LocalDateTime;
 import java.time.Duration;
+import java.util.List;
 
 @Entity
 @Table(name = "quiz_attempts")
@@ -54,6 +55,26 @@ public class QuizAttempt {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AttemptStatus status = AttemptStatus.STARTED;
+    
+    // Additional fields from schema
+    @Column(name = "time_taken")
+    private Integer timeTaken; // in seconds
+    
+    @Column(name = "percentage_score", columnDefinition = "DECIMAL(5,2)")
+    private Double percentageScore;
+    
+    @Column(name = "max_possible_score")
+    private Integer maxPossibleScore;
+    
+    @Column(name = "ip_address", length = 45)
+    private String ipAddress;
+    
+    @Column(name = "user_agent", columnDefinition = "TEXT")
+    private String userAgent;
+    
+    // Relationships
+    @OneToMany(mappedBy = "quizAttempt", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Answer> answers;
 
     // Constructors
     public QuizAttempt() {
@@ -176,6 +197,55 @@ public class QuizAttempt {
 
     public void setStatus(AttemptStatus status) {
         this.status = status;
+    }
+    
+    // Additional getters and setters
+    public Integer getTimeTaken() {
+        return timeTaken;
+    }
+    
+    public void setTimeTaken(Integer timeTaken) {
+        this.timeTaken = timeTaken;
+    }
+    
+    public Double getPercentageScore() {
+        return percentageScore;
+    }
+    
+    public void setPercentageScore(Double percentageScore) {
+        this.percentageScore = percentageScore;
+    }
+    
+    public Integer getMaxPossibleScore() {
+        return maxPossibleScore;
+    }
+    
+    public void setMaxPossibleScore(Integer maxPossibleScore) {
+        this.maxPossibleScore = maxPossibleScore;
+    }
+    
+    public String getIpAddress() {
+        return ipAddress;
+    }
+    
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+    
+    public String getUserAgent() {
+        return userAgent;
+    }
+    
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
+    
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+    
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
     }
 
     public double getPercentage() {

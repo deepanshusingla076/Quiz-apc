@@ -128,4 +128,104 @@ public class UserService implements UserDetailsService {
     public List<User> getUsersByRole(com.qwizz.model.Role role) {
         return userRepository.findByRoleAndActiveTrue(role);
     }
+    
+    // Enhanced methods for dashboard and statistics
+    
+    public List<User> getTopUsersByPoints() {
+        return userRepository.findTop10ByOrderByTotalPointsDesc();
+    }
+    
+    public List<User> getUsersByStreak(Integer minStreak) {
+        return userRepository.findByQuizStreakGreaterThanOrderByQuizStreakDesc(minStreak);
+    }
+    
+    public List<User> getUsersByAverageScore(Double minScore) {
+        return userRepository.findByAverageScoreGreaterThanEqual(minScore);
+    }
+    
+    public List<User> getMostActiveUsers() {
+        return userRepository.findMostActiveUsers();
+    }
+    
+    public List<User> getTopCreators() {
+        return userRepository.findTopCreators();
+    }
+    
+    public List<User> searchUsers(String search) {
+        return userRepository.searchUsers(search);
+    }
+    
+    public List<User> getUsersByLocation(String location) {
+        return userRepository.findByLocationContainingIgnoreCaseAndActiveTrue(location);
+    }
+    
+    public int getUserCountByRole(com.qwizz.model.Role role) {
+        return userRepository.countByRole(role);
+    }
+    
+    public List<User> getRecentUsers(LocalDateTime since) {
+        return userRepository.findRecentUsers(since);
+    }
+    
+    public void updateUserLastLogin(Long userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setLastLogin(LocalDateTime.now());
+            userRepository.save(user);
+        }
+    }
+    
+    public void updateUserStatistics(User user, int pointsEarned, double quizScore, boolean maintainedStreak) {
+        user.addPoints(pointsEarned);
+        user.incrementQuizzesTaken();
+        user.updateAverageScore(quizScore);
+        
+        if (maintainedStreak) {
+            user.setQuizStreak(user.getQuizStreak() + 1);
+        } else {
+            user.setQuizStreak(0);
+        }
+        
+        userRepository.save(user);
+    }
+    
+    public void incrementUserQuizzesCreated(Long userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.incrementQuizzesCreated();
+            userRepository.save(user);
+        }
+    }
+    
+    public User updateUserProfile(User user, String bio, String phone, String location, java.sql.Date dateOfBirth) {
+        user.setBio(bio);
+        user.setPhone(phone);
+        user.setLocation(location);
+        user.setDateOfBirth(dateOfBirth);
+        user.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(user);
+    }
+    
+    public User updateProfilePicture(Long userId, String profilePictureUrl) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setProfilePicture(profilePictureUrl);
+            user.setUpdatedAt(LocalDateTime.now());
+            return userRepository.save(user);
+        }
+        throw new RuntimeException("User not found");
+    }
+    
+    public void verifyUserEmail(Long userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setEmailVerified(true);
+            user.setUpdatedAt(LocalDateTime.now());
+            userRepository.save(user);
+        }
+    }
 }

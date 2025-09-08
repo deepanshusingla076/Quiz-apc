@@ -37,53 +37,152 @@
 /* --- Body --- */
 body {
     font-family: var(--font-secondary);
-    background-color: var(--light);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--brutal-pink) 50%, var(--secondary) 100%);
     color: var(--dark);
     margin: 0;
     padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-/* --- Auth Container --- */
+/* --- Sliding Container --- */
 .auth-container {
-    min-height: 35vh;
+    position: relative;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: var(--space-lg);
 }
 
-.auth-card {
-    background: var(--white);
-    border: var(--border-thick);
-    padding: var(--space-xl);
-    max-width: 600px;
+.sliding-wrapper {
+    position: relative;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
-    box-shadow: var(--shadow-card);
+    max-width: 800px;
+    height: 600px;
+    overflow: hidden;
+    border: var(--border-thick);
+    box-shadow: var(--shadow-brutal);
+    background: var(--white);
 }
 
-/* --- Header --- */
-.auth-header h2 {
+.slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.slide.active {
+    transform: translateX(0);
+}
+
+.slide.prev {
+    transform: translateX(-100%);
+}
+
+.slide.next {
+    transform: translateX(100%);
+}
+
+/* --- Step Header --- */
+.step-header {
+    background: linear-gradient(135deg, var(--primary), var(--brutal-pink));
+    color: var(--white);
+    padding: var(--space-lg);
+    text-align: center;
+    border-bottom: var(--border-thick);
+    position: relative;
+    overflow: hidden;
+}
+
+.step-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.step-title {
     font-family: var(--font-primary);
-    font-size: 2.5rem;
-    color: var(--primary);
+    font-size: 2rem;
+    margin: 0;
     text-transform: uppercase;
-    margin-bottom: var(--space-sm);
+    text-shadow: 2px 2px 0px var(--black);
 }
 
-.auth-header p {
-    color: var(--dark);
+.step-subtitle {
+    margin: var(--space-sm) 0 0 0;
     font-weight: 700;
-    font-size: 1.1rem;
+    opacity: 0.9;
 }
 
-/* --- Form --- */
-.form-group {
+/* --- Step Progress --- */
+.step-progress {
+    padding: var(--space-md);
+    background: var(--light);
+    border-bottom: var(--border-thin);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--white);
+    border: var(--border-thin);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--brutal-pink));
+    transition: width 0.6s ease;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: repeating-linear-gradient(90deg, 
+        transparent, 
+        transparent 4px, 
+        rgba(255,255,255,0.3) 4px, 
+        rgba(255,255,255,0.3) 8px);
+    animation: flow 1s linear infinite;
+}
+
+@keyframes flow {
+    0% { transform: translateX(-8px); }
+    100% { transform: translateX(0); }
+}
+
+/* --- Step Content --- */
+.step-content {
+    flex: 1;
+    padding: var(--space-xl);
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
+    justify-content: center;
+}
+
+/* --- Form Styles --- */
+.form-group {
+    margin-bottom: var(--space-lg);
+    position: relative;
 }
 
 .form-row {
@@ -102,25 +201,20 @@ body {
     font-size: 0.95rem;
     letter-spacing: 0.5px;
     color: var(--dark);
-}
-
-.form-label.optional {
-    font-weight: 700;
-    font-style: italic;
-    font-size: 0.85rem;
-    color: var(--dark);
-    margin-left: var(--space-xs);
+    margin-bottom: var(--space-xs);
+    display: block;
 }
 
 .form-control {
+    width: 100%;
     border: var(--border-thin);
     padding: 12px 16px;
     font-size: 1rem;
     font-weight: 700;
-    text-transform: uppercase;
     background: var(--light);
     color: var(--dark);
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    position: relative;
 }
 
 .form-control:focus {
@@ -128,93 +222,190 @@ body {
     outline: none;
     transform: translate(-2px, -2px);
     box-shadow: var(--shadow-small);
+    background: var(--white);
 }
 
 /* --- Role Selector --- */
 .role-selector {
-    display: flex;
-    gap: var(--space-sm);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
 }
 
 .role-option {
-    flex: 1;
-    padding: var(--space-sm);
+    padding: var(--space-lg);
     border: var(--border-thin);
     background: var(--light);
-    font-weight: 700;
     text-align: center;
-    text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.role-option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    transition: left 0.3s ease;
+    opacity: 0.1;
+}
+
+.role-option:hover::before,
+.role-option.selected::before {
+    left: 0;
 }
 
 .role-option.selected,
 .role-option:hover {
     border: var(--border-thick);
+    background: var(--white);
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-small);
+}
+
+.role-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+    color: var(--primary);
+}
+
+.role-text {
+    font-family: var(--font-primary);
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+}
+
+/* --- Navigation Buttons --- */
+.step-navigation {
+    padding: var(--space-lg);
+    background: var(--light);
+    border-top: var(--border-thin);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-step {
+    padding: var(--space-md) var(--space-lg);
+    font-family: var(--font-primary);
+    font-weight: 900;
+    text-transform: uppercase;
+    border: var(--border-thick);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--white);
+    color: var(--black);
+    font-size: 0.9rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-step::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--primary);
+    transition: left 0.3s ease;
+    z-index: 0;
+}
+
+.btn-step:hover::before {
+    left: 0;
+}
+
+.btn-step:hover {
+    color: var(--white);
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-small);
+}
+
+.btn-step span {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-step:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-step:disabled::before {
+    display: none;
+}
+
+.btn-primary {
     background: var(--primary);
     color: var(--white);
+}
+
+.btn-primary::before {
+    background: var(--brutal-pink);
+}
+
+/* --- Step Indicators --- */
+.step-indicators {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+}
+
+.step-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--white);
+    border: var(--border-thin);
+    transition: all 0.3s ease;
+}
+
+.step-indicator.active {
+    background: var(--primary);
+    transform: scale(1.2);
     box-shadow: var(--shadow-small);
-    transform: translate(-2px, -2px);
 }
 
 /* --- Password Strength --- */
 .password-strength {
-    height: 8px;
+    height: 6px;
     border-radius: 0;
     margin-top: 8px;
-    background: #e2e8f0;
-    transition: all 0.3s ease;
+    background: var(--light);
+    border: 1px solid var(--black);
+    overflow: hidden;
 }
 
 .strength-weak { background: linear-gradient(90deg, #ff5e5b 0%, #ff8a80 100%); width: 33%; }
 .strength-medium { background: linear-gradient(90deg, #ffb627 0%, #ffd54f 100%); width: 66%; }
 .strength-strong { background: linear-gradient(90deg, #00f5a0 0%, #66bb6a 100%); width: 100%; }
 
-/* --- Button --- */
-.btn-auth {
-    background: var(--primary);
-    color: var(--white);
-    padding: 14px 0;
-    font-family: var(--font-primary);
-    font-weight: 900;
-    text-transform: uppercase;
-    border: var(--border-thick);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 1.1rem;
-}
-
-.btn-auth:hover {
-    background: var(--brutal-pink);
-    transform: translate(-4px, -4px);
-    box-shadow: var(--shadow-brutal);
-}
-
-/* --- Footer --- */
-.auth-footer {
-    margin-top: var(--space-md);
-    text-align: center;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.auth-footer a {
-    color: var(--primary);
-    text-decoration: none;
-}
-
-.auth-footer a:hover {
-    color: var(--brutal-pink);
-    text-decoration: underline;
-}
-
 /* --- Responsive --- */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+    .sliding-wrapper {
+        height: auto;
+        min-height: 500px;
+    }
+    
     .form-row {
         flex-direction: column;
     }
+    
     .role-selector {
-        flex-direction: column;
+        grid-template-columns: 1fr;
+    }
+    
+    .step-title {
+        font-size: 1.5rem;
     }
 }
 
@@ -245,124 +436,355 @@ body {
 .alert i {
     font-size: 1.2rem;
 }
+
+/* --- Back to Login Link --- */
+.back-to-login {
+    text-align: center;
+    margin-top: var(--space-md);
+}
+
+.back-to-login a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.back-to-login a:hover {
+    color: var(--brutal-pink);
+    text-decoration: underline;
+}
 </style>
 </head>
 <body>
     <div layout:fragment="content">
         <div class="auth-container">
-            <div class="auth-card">
-                <div class="auth-header">
-                    <h2><i class="fas fa-user-plus"></i> Join QWIZZ</h2>
-                    <p>Create your account and start your learning journey</p>
-                </div>
-
-                <!-- Error/Success Messages -->
-                <div th:if="${errorMessage}" class="alert alert-error mb-md">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span th:text="${errorMessage}"></span>
-                </div>
-
-                <div th:if="${successMessage}" class="alert alert-success mb-md">
-                    <i class="fas fa-check-circle"></i>
-                    <span th:text="${successMessage}"></span>
-                </div>
-
-                <form id="registerForm" action="/register" method="post">
-                    <div class="form-row">
+            <div class="sliding-wrapper">
+                
+                <!-- Step 1: Welcome & Role Selection -->
+                <div class="slide active" id="step1">
+                    <div class="step-header">
+                        <h2 class="step-title">
+                            <i class="fas fa-rocket"></i> Welcome to QWIZZ
+                        </h2>
+                        <p class="step-subtitle">Let's get you started on your learning journey!</p>
+                    </div>
+                    
+                    <div class="step-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 25%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-content">
                         <div class="form-group">
-                            <label class="form-label" for="firstName">First Name</label>
-                            <input type="text" id="firstName" name="firstName" class="form-control" required>
+                            <label class="form-label">Choose Your Role</label>
+                            <div class="role-selector">
+                                <div class="role-option selected" onclick="selectRole('STUDENT')" id="studentRole">
+                                    <div class="role-icon">
+                                        <i class="fas fa-graduation-cap"></i>
+                                    </div>
+                                    <div class="role-text">Student</div>
+                                    <p style="margin-top: 8px; font-size: 0.8rem; color: #666;">Take quizzes and learn</p>
+                                </div>
+                                <div class="role-option" onclick="selectRole('TEACHER')" id="teacherRole">
+                                    <div class="role-icon">
+                                        <i class="fas fa-chalkboard-teacher"></i>
+                                    </div>
+                                    <div class="role-text">Teacher</div>
+                                    <p style="margin-top: 8px; font-size: 0.8rem; color: #666;">Create and manage quizzes</p>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                    
+                    <div class="step-navigation">
+                        <div class="step-indicators">
+                            <div class="step-indicator active"></div>
+                            <div class="step-indicator"></div>
+                            <div class="step-indicator"></div>
+                        </div>
+                        <button type="button" class="btn-step btn-primary" onclick="nextStep()">
+                            <span><i class="fas fa-arrow-right"></i> Continue</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Personal Information -->
+                <div class="slide next" id="step2">
+                    <div class="step-header">
+                        <h2 class="step-title">
+                            <i class="fas fa-user"></i> Personal Information
+                        </h2>
+                        <p class="step-subtitle">Tell us about yourself</p>
+                    </div>
+                    
+                    <div class="step-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-content">
+                        <!-- Error/Success Messages -->
+                        <div th:if="${errorMessage}" class="alert alert-error">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span th:text="${errorMessage}"></span>
+                        </div>
+
+                        <div th:if="${successMessage}" class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <span th:text="${successMessage}"></span>
+                        </div>
+
+                        <form id="registerForm" action="/register" method="post" style="display: none;">
+                            <input type="hidden" id="selectedRole" name="role" value="STUDENT">
+                            <input type="hidden" id="hiddenFirstName" name="firstName">
+                            <input type="hidden" id="hiddenLastName" name="lastName">
+                            <input type="hidden" id="hiddenUsername" name="username">
+                            <input type="hidden" id="hiddenEmail" name="email">
+                            <input type="hidden" id="hiddenPassword" name="password">
+                            <input type="hidden" id="hiddenConfirmPassword" name="confirmPassword">
+                        </form>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="firstName">First Name</label>
+                                <input type="text" id="firstName" class="form-control" required minlength="2">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="lastName">Last Name</label>
+                                <input type="text" id="lastName" class="form-control" required minlength="2">
+                            </div>
+                        </div>
+
                         <div class="form-group">
-                            <label class="form-label" for="lastName">Last Name <span class="optional">(Optional)</span></label>
-                            <input type="text" id="lastName" name="lastName" class="form-control">
+                            <label class="form-label" for="username">Username</label>
+                            <input type="text" id="username" class="form-control" required minlength="3">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input type="email" id="email" class="form-control" required>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="username">Username</label>
-                        <input type="text" id="username" name="username" class="form-control" required minlength="3">
+                    
+                    <div class="step-navigation">
+                        <button type="button" class="btn-step" onclick="prevStep()">
+                            <span><i class="fas fa-arrow-left"></i> Back</span>
+                        </button>
+                        <div class="step-indicators">
+                            <div class="step-indicator"></div>
+                            <div class="step-indicator active"></div>
+                            <div class="step-indicator"></div>
+                        </div>
+                        <button type="button" class="btn-step btn-primary" onclick="nextStep()" id="step2Next">
+                            <span><i class="fas fa-arrow-right"></i> Continue</span>
+                        </button>
                     </div>
+                </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="email">Email Address</label>
-                        <input type="email" id="email" name="email" class="form-control" required>
+                <!-- Step 3: Password & Confirmation -->
+                <div class="slide next" id="step3">
+                    <div class="step-header">
+                        <h2 class="step-title">
+                            <i class="fas fa-lock"></i> Secure Your Account
+                        </h2>
+                        <p class="step-subtitle">Choose a strong password</p>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Account Type</label>
-                        <div class="role-selector">
-                            <label class="role-option" for="teacher">
-                                <input type="radio" id="teacher" name="role" value="TEACHER"> Teacher
-                            </label>
-                            <label class="role-option selected" for="student">
-                                <input type="radio" id="student" name="role" value="STUDENT" checked> Student
-                            </label>
+                    
+                    <div class="step-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
                         </div>
                     </div>
+                    
+                    <div class="step-content">
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input type="password" id="password" class="form-control" required minlength="6">
+                            <div class="password-strength" id="passwordStrength"></div>
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="password">Password</label>
-                        <input type="password" id="password" name="password" class="form-control" required minlength="6">
-                        <div class="password-strength" id="passwordStrength"></div>
+                        <div class="form-group">
+                            <label class="form-label" for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" class="form-control" required minlength="6">
+                        </div>
+
+                        <div class="back-to-login">
+                            <p>Already have an account? <a href="/login">Sign in here</a></p>
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required minlength="6">
+                    
+                    <div class="step-navigation">
+                        <button type="button" class="btn-step" onclick="prevStep()">
+                            <span><i class="fas fa-arrow-left"></i> Back</span>
+                        </button>
+                        <div class="step-indicators">
+                            <div class="step-indicator"></div>
+                            <div class="step-indicator"></div>
+                            <div class="step-indicator active"></div>
+                        </div>
+                        <button type="button" class="btn-step btn-primary" onclick="submitForm()" id="submitBtn">
+                            <span><i class="fas fa-user-plus"></i> Create Account</span>
+                        </button>
                     </div>
-
-                    <button type="submit" class="btn-auth">
-                        <i class="fas fa-user-plus"></i> Create Account
-                    </button>
-                </form>
-
-                <div class="auth-footer">
-                    Already have an account? <a href="/login">Sign in</a>
                 </div>
             </div>
         </div>
 
-        <script layout:fragment="scripts">
-        // Role selection
-        const roleOptions = document.querySelectorAll('.role-option');
-        roleOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                roleOptions.forEach(o => o.classList.remove('selected'));
-                option.classList.add('selected');
-                option.querySelector('input[type="radio"]').checked = true;
-            });
-        });
+        <script>
+            let currentStep = 1;
+            const totalSteps = 3;
 
-        // Password strength
-        const passwordField = document.getElementById('password');
-        const strengthIndicator = document.getElementById('passwordStrength');
-
-        passwordField.addEventListener('input', () => {
-            const val = passwordField.value;
-            let strength = 0;
-            if (val.length >= 6) strength++;
-            if (/[A-Z]/.test(val)) strength++;
-            if (/[0-9]/.test(val)) strength++;
-            strengthIndicator.className = 'password-strength';
-            if (strength >= 3) strengthIndicator.classList.add('strength-strong');
-            else if (strength >= 2) strengthIndicator.classList.add('strength-medium');
-            else if (strength >= 1) strengthIndicator.classList.add('strength-weak');
-        });
-
-        // Confirm password
-        const confirmField = document.getElementById('confirmPassword');
-        function validatePasswords() {
-            if (confirmField.value && passwordField.value !== confirmField.value) {
-                confirmField.setCustomValidity('Passwords do not match');
-                confirmField.style.borderColor = '#dc3545';
-            } else {
-                confirmField.setCustomValidity('');
-                confirmField.style.borderColor = '';
+            // Role selection
+            function selectRole(role) {
+                document.querySelectorAll('.role-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                if (role === 'STUDENT') {
+                    document.getElementById('studentRole').classList.add('selected');
+                } else {
+                    document.getElementById('teacherRole').classList.add('selected');
+                }
+                
+                document.getElementById('selectedRole').value = role;
             }
-        }
-        passwordField.addEventListener('input', validatePasswords);
-        confirmField.addEventListener('input', validatePasswords);
+
+            // Step navigation
+            function nextStep() {
+                if (currentStep < totalSteps) {
+                    if (validateCurrentStep()) {
+                        // Hide current step
+                        document.getElementById(`step${currentStep}`).classList.remove('active');
+                        document.getElementById(`step${currentStep}`).classList.add('prev');
+                        
+                        // Show next step
+                        currentStep++;
+                        document.getElementById(`step${currentStep}`).classList.remove('next');
+                        document.getElementById(`step${currentStep}`).classList.add('active');
+                        
+                        updateStepIndicators();
+                    }
+                }
+            }
+
+            function prevStep() {
+                if (currentStep > 1) {
+                    // Hide current step
+                    document.getElementById(`step${currentStep}`).classList.remove('active');
+                    document.getElementById(`step${currentStep}`).classList.add('next');
+                    
+                    // Show previous step
+                    currentStep--;
+                    document.getElementById(`step${currentStep}`).classList.remove('prev');
+                    document.getElementById(`step${currentStep}`).classList.add('active');
+                    
+                    updateStepIndicators();
+                }
+            }
+
+            function updateStepIndicators() {
+                document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+                    if (index < currentStep) {
+                        indicator.classList.add('active');
+                    } else {
+                        indicator.classList.remove('active');
+                    }
+                });
+            }
+
+            function validateCurrentStep() {
+                if (currentStep === 2) {
+                    const firstName = document.getElementById('firstName').value.trim();
+                    const lastName = document.getElementById('lastName').value.trim();
+                    const username = document.getElementById('username').value.trim();
+                    const email = document.getElementById('email').value.trim();
+                    
+                    if (!firstName || !lastName || !username || !email) {
+                        alert('Please fill in all required fields.');
+                        return false;
+                    }
+                    
+                    if (firstName.length < 2 || lastName.length < 2) {
+                        alert('First and last name must be at least 2 characters long.');
+                        return false;
+                    }
+                    
+                    if (username.length < 3) {
+                        alert('Username must be at least 3 characters long.');
+                        return false;
+                    }
+                    
+                    // Basic email validation
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        alert('Please enter a valid email address.');
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+
+            function submitForm() {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (password.length < 6) {
+                    alert('Password must be at least 6 characters long.');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match.');
+                    return;
+                }
+                
+                // Copy values to hidden form
+                document.getElementById('hiddenFirstName').value = document.getElementById('firstName').value;
+                document.getElementById('hiddenLastName').value = document.getElementById('lastName').value;
+                document.getElementById('hiddenUsername').value = document.getElementById('username').value;
+                document.getElementById('hiddenEmail').value = document.getElementById('email').value;
+                document.getElementById('hiddenPassword').value = password;
+                document.getElementById('hiddenConfirmPassword').value = confirmPassword;
+                
+                // Submit the form
+                document.getElementById('registerForm').submit();
+            }
+
+            // Password strength indicator
+            document.getElementById('password').addEventListener('input', function() {
+                const val = this.value;
+                let strength = 0;
+                if (val.length >= 6) strength++;
+                if (/[A-Z]/.test(val)) strength++;
+                if (/[0-9]/.test(val)) strength++;
+                
+                const strengthIndicator = document.getElementById('passwordStrength');
+                strengthIndicator.className = 'password-strength';
+                if (strength >= 3) strengthIndicator.classList.add('strength-strong');
+                else if (strength >= 2) strengthIndicator.classList.add('strength-medium');
+                else if (strength >= 1) strengthIndicator.classList.add('strength-weak');
+            });
+
+            // Confirm password validation
+            document.getElementById('confirmPassword').addEventListener('input', function() {
+                const password = document.getElementById('password').value;
+                if (this.value && password !== this.value) {
+                    this.style.borderColor = '#dc3545';
+                } else {
+                    this.style.borderColor = '';
+                }
+            });
+
+            // Initialize
+            document.addEventListener('DOMContentLoaded', function() {
+                selectRole('STUDENT');
+            });
         </script>
     </div>
 </body>

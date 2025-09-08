@@ -6,6 +6,172 @@
     <title th:text="${pageTitle}">QWIZZ - Interactive Quiz Platform</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0;
+            border: 4px solid #000;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 8px 8px 0px #000;
+            transform: scale(0.7);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #FF6B35, #FF3366);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #000;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-family: 'Arial Black', Arial, sans-serif;
+            font-size: 2rem;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 3px solid #000;
+            font-size: 16px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            background: #fff;
+            box-shadow: 4px 4px 0px #FF6B35;
+            transform: translate(-2px, -2px);
+        }
+
+        .btn-modal {
+            width: 100%;
+            padding: 15px;
+            background: #FF6B35;
+            color: white;
+            border: 3px solid #000;
+            font-family: 'Arial Black', Arial, sans-serif;
+            font-size: 1rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .btn-modal:hover {
+            background: #FF3366;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        .modal-footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        .modal-footer a {
+            color: #FF6B35;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .modal-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .role-option {
+            padding: 15px;
+            border: 3px solid #ddd;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .role-option:hover,
+        .role-option.selected {
+            border-color: #FF6B35;
+            background: #fff;
+            transform: scale(1.05);
+        }
+
+        .role-option i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .role-option span {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -43,8 +209,8 @@
                 </div>
                 
                 <div th:unless="${session.isLoggedIn}">
-                    <a href="/auth/login" class="nav-link">Login</a>
-                    <a href="/auth/register" class="nav-link btn-primary">Register</a>
+                    <a href="#" class="nav-link" onclick="openModal('loginModal')">Login</a>
+                    <a href="#" class="nav-link btn-primary" onclick="openModal('registerModal')">Register</a>
                 </div>
             </div>
             
@@ -87,7 +253,7 @@
                         </a>
                     </div>
                     <div th:unless="${session.isLoggedIn}">
-                        <a href="/auth/register" class="btn btn-primary btn-large">
+                        <a href="#" class="btn btn-primary btn-large" onclick="openModal('registerModal')">
                             <i class="fas fa-rocket"></i>
                             Get Started Free
                         </a>
@@ -227,11 +393,11 @@
                         </a>
                     </div>
                     <div th:unless="${session.isLoggedIn}">
-                        <a href="/auth/register" class="btn btn-primary btn-large">
+                        <a href="#" class="btn btn-primary btn-large" onclick="openModal('registerModal')">
                             <i class="fas fa-user-plus"></i>
                             Sign Up Now
                         </a>
-                        <a href="/auth/login" class="btn btn-secondary btn-large">
+                        <a href="#" class="btn btn-secondary btn-large" onclick="openModal('loginModal')">
                             <i class="fas fa-sign-in-alt"></i>
                             Login
                         </a>
@@ -240,6 +406,125 @@
             </div>
         </div>
     </section>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('loginModal')">&times;</span>
+                <h2><i class="fas fa-sign-in-alt"></i> Login to QWIZZ</h2>
+            </div>
+            <div class="modal-body">
+                <div id="loginError" class="alert alert-error" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="loginErrorText"></span>
+                </div>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginUsername">Username or Email</label>
+                        <input type="text" id="loginUsername" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Login As</label>
+                        <div class="role-selector">
+                            <div class="role-option" onclick="selectLoginRole('STUDENT')" id="loginStudentRole">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Student</span>
+                            </div>
+                            <div class="role-option" onclick="selectLoginRole('TEACHER')" id="loginTeacherRole">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span>Teacher</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="loginSelectedRole" name="role" value="">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-modal" id="loginSubmitBtn">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <p>Don't have an account? <a href="#" onclick="switchModal('loginModal', 'registerModal')">Sign up here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('registerModal')">&times;</span>
+                <h2><i class="fas fa-user-plus"></i> Join QWIZZ</h2>
+            </div>
+            <div class="modal-body">
+                <div id="registerError" class="alert alert-error" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="registerErrorText"></span>
+                </div>
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Choose Your Role</label>
+                        <div class="role-selector">
+                            <div class="role-option selected" onclick="selectRole('STUDENT')" id="studentRole">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Student</span>
+                            </div>
+                            <div class="role-option" onclick="selectRole('TEACHER')" id="teacherRole">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span>Teacher</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selectedRole" name="role" value="STUDENT" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerFirstName">First Name</label>
+                        <input type="text" id="registerFirstName" name="firstName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerLastName">Last Name</label>
+                        <input type="text" id="registerLastName" name="lastName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" name="username" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" name="password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerConfirmPassword">Confirm Password</label>
+                        <input type="password" id="registerConfirmPassword" name="confirmPassword" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn-modal" id="registerSubmitBtn">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <p>Already have an account? <a href="#" onclick="switchModal('registerModal', 'loginModal')">Login here</a></p>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -282,5 +567,198 @@
     </footer>
 
     <script src="/js/main.js"></script>
+    <script>
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            setTimeout(() => {
+                document.getElementById(modalId).classList.add('active');
+            }, 10);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            setTimeout(() => {
+                document.getElementById(modalId).style.display = 'none';
+            }, 300);
+        }
+
+        function switchModal(closeId, openId) {
+            closeModal(closeId);
+            setTimeout(() => {
+                openModal(openId);
+            }, 300);
+        }
+
+        function selectRole(role) {
+            // Remove selection from all roles
+            document.querySelectorAll('#registerModal .role-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selection to clicked role
+            if (role === 'STUDENT') {
+                document.getElementById('studentRole').classList.add('selected');
+            } else {
+                document.getElementById('teacherRole').classList.add('selected');
+            }
+            
+            // Set hidden input value
+            document.getElementById('selectedRole').value = role;
+        }
+
+        function selectLoginRole(role) {
+            // Remove selection from all roles
+            document.querySelectorAll('#loginModal .role-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selection to clicked role
+            if (role === 'STUDENT') {
+                document.getElementById('loginStudentRole').classList.add('selected');
+            } else {
+                document.getElementById('loginTeacherRole').classList.add('selected');
+            }
+            
+            // Set hidden input value
+            document.getElementById('loginSelectedRole').value = role;
+        }
+
+        // Handle Login Form Submission
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            const errorDiv = document.getElementById('loginError');
+            const errorText = document.getElementById('loginErrorText');
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            
+            // Hide previous errors
+            errorDiv.style.display = 'none';
+            
+            // Get form data
+            const formData = new FormData();
+            formData.append('username', document.getElementById('loginUsername').value);
+            formData.append('password', document.getElementById('loginPassword').value);
+            formData.append('role', document.getElementById('loginSelectedRole').value);
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    // Success - redirect or reload page
+                    window.location.reload();
+                } else {
+                    // Error - show error message
+                    const text = await response.text();
+                    errorText.textContent = 'Invalid username, password, or role selection';
+                    errorDiv.style.display = 'flex';
+                }
+            } catch (error) {
+                errorText.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'flex';
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            }
+        }
+
+        // Handle Register Form Submission
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById('registerSubmitBtn');
+            const errorDiv = document.getElementById('registerError');
+            const errorText = document.getElementById('registerErrorText');
+            
+            // Basic validation
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                errorText.textContent = 'Passwords do not match';
+                errorDiv.style.display = 'flex';
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorText.textContent = 'Password must be at least 6 characters long';
+                errorDiv.style.display = 'flex';
+                return;
+            }
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            
+            // Hide previous errors
+            errorDiv.style.display = 'none';
+            
+            // Get form data
+            const formData = new FormData();
+            formData.append('firstName', document.getElementById('registerFirstName').value);
+            formData.append('lastName', document.getElementById('registerLastName').value);
+            formData.append('username', document.getElementById('registerUsername').value);
+            formData.append('email', document.getElementById('registerEmail').value);
+            formData.append('password', password);
+            formData.append('confirmPassword', confirmPassword);
+            formData.append('role', document.getElementById('selectedRole').value);
+            
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    // Success - show success message and switch to login
+                    alert('Account created successfully! Please log in.');
+                    closeModal('registerModal');
+                    openModal('loginModal');
+                    
+                    // Clear form
+                    document.getElementById('registerForm').reset();
+                } else {
+                    // Error - show error message
+                    const text = await response.text();
+                    if (text.includes('username')) {
+                        errorText.textContent = 'Username already exists';
+                    } else if (text.includes('email')) {
+                        errorText.textContent = 'Email already registered';
+                    } else {
+                        errorText.textContent = 'Registration failed. Please try again.';
+                    }
+                    errorDiv.style.display = 'flex';
+                }
+            } catch (error) {
+                errorText.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'flex';
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal(event.target.id);
+            }
+        }
+
+        // Default role selection
+        document.addEventListener('DOMContentLoaded', function() {
+            selectRole('STUDENT');
+            selectLoginRole('STUDENT');
+        });
+    </script>
 </body>
 </html>
