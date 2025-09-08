@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" layout:decorate="~{layout}">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Register - QWIZZ Brutalist Enhanced</title>
+<title>Register - QWIZZ</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root {
@@ -219,114 +217,153 @@ body {
         flex-direction: column;
     }
 }
+
+/* Alert Messages */
+.alert {
+    padding: var(--space-md);
+    border: var(--border-thick);
+    margin-bottom: var(--space-md);
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.alert-error {
+    background: #FFE5E5;
+    color: var(--black);
+    border-color: #FF0000;
+}
+
+.alert-success {
+    background: #E5FFE5;
+    color: var(--black);
+    border-color: #00AA00;
+}
+
+.alert i {
+    font-size: 1.2rem;
+}
 </style>
 </head>
 <body>
+    <div layout:fragment="content">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2><i class="fas fa-user-plus"></i> Join QWIZZ</h2>
+                    <p>Create your account and start your learning journey</p>
+                </div>
 
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <h2><i class="fas fa-user-plus"></i> Join QWIZZ</h2>
-            <p>Create your account and start your learning journey</p>
+                <!-- Error/Success Messages -->
+                <div th:if="${errorMessage}" class="alert alert-error mb-md">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span th:text="${errorMessage}"></span>
+                </div>
+
+                <div th:if="${successMessage}" class="alert alert-success mb-md">
+                    <i class="fas fa-check-circle"></i>
+                    <span th:text="${successMessage}"></span>
+                </div>
+
+                <form id="registerForm" action="/register" method="post">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="firstName">First Name</label>
+                            <input type="text" id="firstName" name="firstName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="lastName">Last Name <span class="optional">(Optional)</span></label>
+                            <input type="text" id="lastName" name="lastName" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" required minlength="3">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Account Type</label>
+                        <div class="role-selector">
+                            <label class="role-option" for="teacher">
+                                <input type="radio" id="teacher" name="role" value="TEACHER"> Teacher
+                            </label>
+                            <label class="role-option selected" for="student">
+                                <input type="radio" id="student" name="role" value="STUDENT" checked> Student
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" required minlength="6">
+                        <div class="password-strength" id="passwordStrength"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required minlength="6">
+                    </div>
+
+                    <button type="submit" class="btn-auth">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account? <a href="/login">Sign in</a>
+                </div>
+            </div>
         </div>
 
-        <form id="registerForm" action="/register" method="post">
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="firstName">First Name</label>
-                    <input type="text" id="firstName" name="firstName" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="lastName">Last Name <span class="optional">(Optional)</span></label>
-                    <input type="text" id="lastName" name="lastName" class="form-control">
-                </div>
-            </div>
+        <script layout:fragment="scripts">
+        // Role selection
+        const roleOptions = document.querySelectorAll('.role-option');
+        roleOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                roleOptions.forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                option.querySelector('input[type="radio"]').checked = true;
+            });
+        });
 
-            <div class="form-group">
-                <label class="form-label" for="username">Username</label>
-                <input type="text" id="username" name="username" class="form-control" required minlength="3">
-            </div>
+        // Password strength
+        const passwordField = document.getElementById('password');
+        const strengthIndicator = document.getElementById('passwordStrength');
 
-            <div class="form-group">
-                <label class="form-label" for="email">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" required>
-            </div>
+        passwordField.addEventListener('input', () => {
+            const val = passwordField.value;
+            let strength = 0;
+            if (val.length >= 6) strength++;
+            if (/[A-Z]/.test(val)) strength++;
+            if (/[0-9]/.test(val)) strength++;
+            strengthIndicator.className = 'password-strength';
+            if (strength >= 3) strengthIndicator.classList.add('strength-strong');
+            else if (strength >= 2) strengthIndicator.classList.add('strength-medium');
+            else if (strength >= 1) strengthIndicator.classList.add('strength-weak');
+        });
 
-            <div class="form-group">
-                <label class="form-label">Account Type</label>
-                <div class="role-selector">
-                    <label class="role-option" for="teacher">
-                        <input type="radio" id="teacher" name="role" value="TEACHER"> Teacher
-                    </label>
-                    <label class="role-option selected" for="student">
-                        <input type="radio" id="student" name="role" value="STUDENT" checked> Student
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" required minlength="6">
-                <div class="password-strength" id="passwordStrength"></div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required minlength="6">
-            </div>
-
-            <button type="submit" class="btn-auth">
-                <i class="fas fa-user-plus"></i> Create Account
-            </button>
-        </form>
-
-        <div class="auth-footer">
-            Already have an account? <a href="/login">Sign in</a>
-        </div>
+        // Confirm password
+        const confirmField = document.getElementById('confirmPassword');
+        function validatePasswords() {
+            if (confirmField.value && passwordField.value !== confirmField.value) {
+                confirmField.setCustomValidity('Passwords do not match');
+                confirmField.style.borderColor = '#dc3545';
+            } else {
+                confirmField.setCustomValidity('');
+                confirmField.style.borderColor = '';
+            }
+        }
+        passwordField.addEventListener('input', validatePasswords);
+        confirmField.addEventListener('input', validatePasswords);
+        </script>
     </div>
-</div>
-
-<script>
-// Role selection
-const roleOptions = document.querySelectorAll('.role-option');
-roleOptions.forEach(option => {
-    option.addEventListener('click', () => {
-        roleOptions.forEach(o => o.classList.remove('selected'));
-        option.classList.add('selected');
-        option.querySelector('input[type="radio"]').checked = true;
-    });
-});
-
-// Password strength
-const passwordField = document.getElementById('password');
-const strengthIndicator = document.getElementById('passwordStrength');
-
-passwordField.addEventListener('input', () => {
-    const val = passwordField.value;
-    let strength = 0;
-    if (val.length >= 6) strength++;
-    if (/[A-Z]/.test(val)) strength++;
-    if (/[0-9]/.test(val)) strength++;
-    strengthIndicator.className = 'password-strength';
-    if (strength >= 3) strengthIndicator.classList.add('strength-strong');
-    else if (strength >= 2) strengthIndicator.classList.add('strength-medium');
-    else if (strength >= 1) strengthIndicator.classList.add('strength-weak');
-});
-
-// Confirm password
-const confirmField = document.getElementById('confirmPassword');
-function validatePasswords() {
-    if (confirmField.value && passwordField.value !== confirmField.value) {
-        confirmField.setCustomValidity('Passwords do not match');
-        confirmField.style.borderColor = '#dc3545';
-    } else {
-        confirmField.setCustomValidity('');
-        confirmField.style.borderColor = '';
-    }
-}
-passwordField.addEventListener('input', validatePasswords);
-confirmField.addEventListener('input', validatePasswords);
-</script>
-
 </body>
 </html>

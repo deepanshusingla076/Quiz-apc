@@ -46,10 +46,26 @@ public class StudentController {
             recentAttempts = recentAttempts.subList(0, 5);
         }
         
+        // Calculate statistics for dashboard
+        int totalQuizzes = availableQuizzes.size();
+        int completedQuizzes = (int) recentAttempts.stream().filter(QuizAttempt::isCompleted).count();
+        double averageScore = recentAttempts.stream()
+                .filter(QuizAttempt::isCompleted)
+                .mapToDouble(QuizAttempt::getScore)
+                .average()
+                .orElse(0.0);
+        
+        // Add all attributes needed by the template
         model.addAttribute("student", student);
         model.addAttribute("analytics", analytics);
-        model.addAttribute("availableQuizzes", availableQuizzes);
+        model.addAttribute("quizzes", availableQuizzes);  // Changed from availableQuizzes
         model.addAttribute("recentAttempts", recentAttempts);
+        
+        // Dashboard statistics
+        model.addAttribute("totalQuizzes", totalQuizzes);
+        model.addAttribute("completedQuizzes", completedQuizzes);
+        model.addAttribute("averageScore", (int) Math.round(averageScore));
+        model.addAttribute("userRank", "#" + (student.getId() % 10 + 1)); // Mock ranking
         
         return "student/dashboard";
     }

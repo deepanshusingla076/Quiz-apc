@@ -309,29 +309,29 @@
       <div class="col-md-3">
         <div class="card">
           <h3><i class="fas fa-clipboard-list"></i> Total Quizzes</h3>
-          <p class="card-number" th:text="${analytics?.totalQuizzes ?: 0}">0</p>
+          <p class="card-number" th:text="${analytics?.totalQuizzesCreated ?: 0}">0</p>
           <small>Quizzes created</small>
         </div>
       </div>
       <div class="col-md-3">
         <div class="card">
           <h3><i class="fas fa-users"></i> Active Students</h3>
-          <p class="card-number" th:text="${analytics?.activeStudents ?: 0}">0</p>
-          <small>Students enrolled</small>
+          <p class="card-number" th:text="${analytics?.totalStudentAttempts ?: 0}">0</p>
+          <small>Student attempts</small>
         </div>
       </div>
       <div class="col-md-3">
         <div class="card">
           <h3><i class="fas fa-chart-line"></i> Avg Score</h3>
-          <p class="card-number" th:text="${analytics?.averageScore != null ? analytics.averageScore + '%' : '0%'}">0%</p>
+          <p class="card-number" th:text="${analytics?.averageQuizScore != null ? #numbers.formatDecimal(analytics.averageQuizScore, 1, 1) + '%' : '0%'}">0%</p>
           <small>Class average</small>
         </div>
       </div>
       <div class="col-md-3">
         <div class="card">
-          <h3><i class="fas fa-clipboard-check"></i> Submissions</h3>
-          <p class="card-number" th:text="${analytics?.totalSubmissions ?: 0}">0</p>
-          <small>This week</small>
+          <h3><i class="fas fa-clipboard-check"></i> Popular Quiz</h3>
+          <p class="card-number" th:text="${analytics?.mostPopularQuizId ?: 0}">0</p>
+          <small>Most attempted</small>
         </div>
       </div>
     </div>
@@ -419,19 +419,19 @@
         </div>
 
         <div class="card">
-          <h4><i class="fas fa-bell"></i> Recent Activity</h4>
-          <div th:if="${analytics?.recentSubmissions != null and !analytics.recentSubmissions.empty}">
-            <div class="activity-item" th:each="activity : ${analytics.recentSubmissions}">
-              <i class="fas fa-user-check text-primary"></i>
+          <h4><i class="fas fa-bell"></i> Recent Quizzes</h4>
+          <div th:if="${recentQuizzes != null and !#lists.isEmpty(recentQuizzes)}">
+            <div class="activity-item" th:each="quiz : ${recentQuizzes}">
+              <i class="fas fa-clipboard-list text-primary"></i>
               <div>
-                <strong th:text="${activity.studentName}">Student Name</strong> completed
-                <em th:text="${activity.quizTitle}">Quiz Title</em>
-                <br><small th:text="${activity.timeAgo}" class="text-muted">2 hours ago</small>
+                <strong th:text="${quiz.title}">Quiz Title</strong> 
+                <span th:text="${quiz.difficulty}">MEDIUM</span>
+                <br><small th:text="${#temporals.format(quiz.createdAt, 'MMM dd, yyyy')}" class="text-muted">Created date</small>
               </div>
             </div>
           </div>
-          <div th:if="${analytics?.recentSubmissions == null or analytics.recentSubmissions.empty}">
-            <p class="text-muted text-center">No recent activity</p>
+          <div th:if="${recentQuizzes == null or #lists.isEmpty(recentQuizzes)}">
+            <p class="text-muted text-center">No quizzes created yet</p>
           </div>
         </div>
       </div>

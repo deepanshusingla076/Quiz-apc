@@ -38,8 +38,7 @@ public class User implements UserDetails {
     @NotBlank(message = "First name is required")
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = 50)
-    @NotBlank(message = "Last name is required")
+    @Column(name = "last_name", length = 50)
     private String lastName;
 
     @Enumerated(EnumType.STRING)

@@ -1,412 +1,690 @@
 <!DOCTYPE html>
-<html lang="en" layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard - QWIZZ</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* BRUTALISTIC THEME */
         :root {
-            /* Colors - Vibrant and Bold */
-            --primary: #FF6B35;
-            --secondary: #00D2FF;
-            --accent: #FFE66D;
-            --success: #00F5A0;
-            --warning: #FFB627;
-            --error: #FF5E5B;
-            --dark: #1A1B23;
-            --light: #F8F9FA;
-            --gray: #6C757D;
-            --white: #FFFFFF;
-            --black: #000000;
-
-            /* Brutal Colors */
+            --brutal-primary: #FF6B35;
             --brutal-pink: #FF3366;
-            --brutal-cyan: #00FFCC;
-            --brutal-purple: #6633FF;
-            --brutal-yellow: #FFCC00;
-            --brutal-green: #33FF66;
+            --brutal-blue: #00D2FF;
+            --brutal-green: #00F5A0;
+            --brutal-yellow: #FFE66D;
+            --brutal-purple: #9D4EDD;
+            --brutal-red: #FF5E5B;
+            --brutal-black: #000000;
+            --brutal-white: #FFFFFF;
+            --brutal-gray: #F8F9FA;
+            --brutal-dark: #1A1B23;
+        }
 
-            /* Typography */
-            --font-primary: 'Arial Black', Arial, sans-serif;
-            --font-secondary: 'Arial', sans-serif;
-            --font-mono: 'Courier New', monospace;
-
-            /* Spacing */
-            --space-xs: 0.25rem;
-            --space-sm: 0.5rem;
-            --space-md: 1rem;
-            --space-lg: 1.5rem;
-            --space-xl: 2rem;
-            --space-xxl: 3rem;
-
-            /* Borders */
-            --border-thick: 4px solid var(--black);
-            --border-medium: 3px solid var(--black);
-            --border-thin: 2px solid var(--black);
-
-            /* Shadows - Brutal and Bold */
-            --shadow-brutal: 8px 8px 0px var(--black);
-            --shadow-brutal-hover: 12px 12px 0px var(--black);
-            --shadow-card: 6px 6px 0px var(--black);
-            --shadow-small: 4px 4px 0px var(--black);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            background: var(--light);
-            color: var(--black);
-            font-family: var(--font-mono);
-            margin: 0;
-            padding: var(--space-lg);
+            font-family: 'Arial Black', Arial, sans-serif;
+            background: var(--brutal-gray);
+            color: var(--brutal-black);
+            line-height: 1.6;
         }
 
-        h1, h4 {
-            font-family: var(--font-primary);
+        /* NAVIGATION */
+        .navbar {
+            background: var(--brutal-white);
+            border-bottom: 6px solid var(--brutal-black);
+            padding: 20px 0;
+            box-shadow: 0 8px 0 var(--brutal-black);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-logo {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--brutal-primary);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-link {
+            color: var(--brutal-black);
+            text-decoration: none;
             font-weight: 900;
             text-transform: uppercase;
-            border-bottom: var(--border-thick);
-            margin-bottom: var(--space-md);
-            padding-bottom: var(--space-xs);
+            padding: 10px 20px;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
         }
 
-        .dashboard-card {
-            background: var(--white);
-            border: var(--border-medium);
-            border-radius: 0;
-            padding: var(--space-md);
-            margin-bottom: var(--space-lg);
-            box-shadow: var(--shadow-card);
-            transition: transform 0.1s ease-in-out;
+        .nav-link:hover {
+            border: 3px solid var(--brutal-black);
+            background: var(--brutal-yellow);
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 var(--brutal-black);
         }
 
-        .dashboard-card:hover {
-            transform: translate(-4px, -4px);
-            box-shadow: var(--shadow-brutal-hover);
-        }
-
-        /* ------------------ Progress Stats ------------------ */
-        .progress-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--space-md);
-            margin-bottom: var(--space-lg);
-        }
-
-        .progress-card {
-            border: var(--border-medium);
-            border-radius: 0;
-            padding: var(--space-md);
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(45deg, var(--brutal-primary), var(--brutal-pink));
+            color: var(--brutal-white);
+            padding: 100px 0;
             text-align: center;
-            background: var(--accent);
-            color: var(--black);
             position: relative;
-            font-family: var(--font-primary);
-            box-shadow: var(--shadow-small);
+            overflow: hidden;
         }
 
-        .progress-card .progress-icon {
+        .hero::before {
+            content: '';
             position: absolute;
-            top: var(--space-sm);
-            right: var(--space-sm);
-            opacity: 0.2;
-            font-size: 2rem;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: repeating-linear-gradient(45deg, 
+                transparent, transparent 20px, 
+                rgba(0,0,0,0.1) 20px, rgba(0,0,0,0.1) 40px);
+            animation: slide 3s linear infinite;
         }
 
-        .progress-number {
+        @keyframes slide {
+            0% { transform: translateX(-40px); }
+            100% { transform: translateX(0); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 0 var(--brutal-black);
+            letter-spacing: 3px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0 var(--brutal-black);
+        }
+
+        /* MAIN CONTENT */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* STATS GRID */
+        .stats-section {
+            margin: 80px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+        }
+
+        .stat-card {
+            background: var(--brutal-white);
+            border: 6px solid var(--brutal-black);
+            padding: 40px;
+            text-align: center;
+            box-shadow: 12px 12px 0 var(--brutal-black);
+            transform: rotate(-2deg);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:nth-child(even) {
+            transform: rotate(2deg);
+        }
+
+        .stat-card:hover {
+            transform: rotate(0deg) scale(1.05);
+            box-shadow: 20px 20px 0 var(--brutal-black);
+        }
+
+        .stat-card.quizzes { background: var(--brutal-yellow); }
+        .stat-card.score { background: var(--brutal-green); }
+        .stat-card.completed { background: var(--brutal-blue); }
+        .stat-card.rank { background: var(--brutal-pink); }
+
+        .stat-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--brutal-black);
+            color: var(--brutal-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 2rem;
+            border: 4px solid var(--brutal-black);
+        }
+
+        .stat-number {
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--brutal-black);
+            margin-bottom: 15px;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--brutal-black);
+        }
+
+        /* CONTENT GRID */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 60px;
+            margin: 80px 0;
+        }
+
+        /* QUIZ SECTION */
+        .quiz-section {
+            background: var(--brutal-white);
+            border: 6px solid var(--brutal-black);
+            padding: 50px;
+            box-shadow: 12px 12px 0 var(--brutal-black);
+            transform: rotate(-1deg);
+        }
+
+        .section-title {
             font-size: 2.5rem;
             font-weight: 900;
-            margin-bottom: var(--space-xs);
+            color: var(--brutal-black);
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        .welcome-section {
-            border: var(--border-thick);
-            border-radius: 0;
-            padding: var(--space-lg);
-            background: var(--brutal-yellow);
-            color: var(--black);
-            text-align: center;
-            font-family: var(--font-primary);
-            margin-bottom: var(--space-lg);
-            box-shadow: var(--shadow-brutal);
+        .section-title::before {
+            content: '';
+            width: 10px;
+            height: 50px;
+            background: var(--brutal-primary);
+            border: 3px solid var(--brutal-black);
         }
 
-        /* ------------------ Quizzes ------------------ */
+        .quiz-grid {
+            display: grid;
+            gap: 30px;
+        }
+
         .quiz-card {
-            border: var(--border-medium);
-            border-radius: 0;
-            margin-bottom: var(--space-md);
-            background: var(--white);
-            transition: background 0.1s ease-in;
-            box-shadow: var(--shadow-small);
+            border: 6px solid var(--brutal-black);
+            padding: 30px;
+            background: var(--brutal-gray);
+            transform: rotate(1deg);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .quiz-card::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            height: 10px;
+            background: var(--brutal-primary);
+            border: 3px solid var(--brutal-black);
         }
 
         .quiz-card:hover {
-            background: var(--brutal-pink);
-            color: var(--white);
-        }
-
-        .quiz-card-header {
-            border-bottom: var(--border-thin);
-            padding: var(--space-md);
-            background: var(--light);
+            transform: rotate(0deg) translateY(-5px);
+            box-shadow: 8px 8px 0 var(--brutal-black);
+            background: var(--brutal-white);
         }
 
         .quiz-title {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 900;
+            color: var(--brutal-black);
+            margin-bottom: 15px;
+            text-transform: uppercase;
         }
 
         .quiz-meta {
             display: flex;
-            flex-wrap: wrap;
-            gap: var(--space-sm);
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: var(--brutal-black);
+            text-transform: uppercase;
             font-size: 0.9rem;
-            color: var(--gray);
         }
 
-        .quiz-card-body {
-            padding: var(--space-md);
+        .quiz-description {
+            color: var(--brutal-dark);
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-weight: 600;
         }
 
-        .quiz-actions .btn {
-            border: var(--border-thick);
-            border-radius: 0;
-            padding: var(--space-sm) var(--space-md);
+        .quiz-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            font-weight: 900;
+            text-decoration: none;
+            text-transform: uppercase;
+            border: 3px solid var(--brutal-black);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Arial Black', Arial, sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--brutal-primary);
+            color: var(--brutal-white);
+        }
+
+        .btn-primary:hover {
+            background: var(--brutal-pink);
+            transform: translate(-3px, -3px);
+            box-shadow: 6px 6px 0 var(--brutal-black);
+        }
+
+        .btn-secondary {
+            background: var(--brutal-white);
+            color: var(--brutal-black);
+        }
+
+        .btn-secondary:hover {
+            background: var(--brutal-yellow);
+            transform: translate(-3px, -3px);
+            box-shadow: 6px 6px 0 var(--brutal-black);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .sidebar-card {
+            background: var(--brutal-white);
+            border: 6px solid var(--brutal-black);
+            padding: 40px;
+            box-shadow: 8px 8px 0 var(--brutal-black);
+            transform: rotate(2deg);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-card:hover {
+            transform: rotate(0deg);
+        }
+
+        .sidebar-card h3 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--brutal-black);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-item {
+            margin-bottom: 25px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
             font-weight: 700;
             text-transform: uppercase;
-            background: var(--white);
-            color: var(--black);
-            cursor: pointer;
-            box-shadow: var(--shadow-small);
+            color: var(--brutal-black);
         }
 
-        .quiz-actions .btn:hover {
-            background: var(--black);
-            color: var(--white);
-        }
-
-        /* ------------------ Progress Bars ------------------ */
-        .progress-bar-custom {
-            height: 14px;
-            background: var(--white);
-            border: var(--border-thin);
-            border-radius: 0;
-            margin-top: var(--space-sm);
-            position: relative;
+        .progress-bar {
+            width: 100%;
+            height: 15px;
+            background: var(--brutal-gray);
+            border: 3px solid var(--brutal-black);
+            overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            background: var(--black);
-            width: 0;
+            background: linear-gradient(90deg, var(--brutal-primary), var(--brutal-pink));
+            transition: width 0.5s ease;
         }
 
-        /* ------------------ Achievements ------------------ */
-        .achievement-badge {
-            display: inline-block;
-            border: var(--border-thin);
-            padding: var(--space-xs) var(--space-md);
-            margin: var(--space-xs);
-            font-weight: 700;
-            background: var(--brutal-green);
-            color: var(--black);
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            padding: 20px 0;
+            border-bottom: 3px solid var(--brutal-black);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--brutal-black);
+            color: var(--brutal-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 900;
+            color: var(--brutal-black);
+            margin-bottom: 5px;
             text-transform: uppercase;
-            box-shadow: var(--shadow-small);
+        }
+
+        .activity-time {
+            color: var(--brutal-dark);
+            font-size: 0.9rem;
+            font-weight: 700;
         }
 
         .empty-state {
-            border: var(--border-thin);
-            padding: var(--space-lg);
             text-align: center;
-            font-weight: 700;
-            background: var(--light);
+            padding: 60px 20px;
+            color: var(--brutal-black);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--brutal-primary);
+        }
+
+        .empty-state h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            border: 3px solid var(--brutal-black);
+            font-size: 0.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-easy { background: var(--brutal-green); color: var(--brutal-black); }
+        .difficulty-medium { background: var(--brutal-yellow); color: var(--brutal-black); }
+        .difficulty-hard { background: var(--brutal-red); color: var(--brutal-white); }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .quiz-section, .sidebar-card {
+                padding: 30px 20px;
+                transform: rotate(0deg);
+            }
+            
+            .nav-menu {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div layout:fragment="content">
-        <!-- Welcome Section -->
-        <div class="welcome-section">
-            <h1>Welcome back, <span th:text="${#authentication.principal.firstName}">Student</span>!</h1>
-            <p>Continue your learning journey and test your knowledge with engaging quizzes.</p>
-        </div>
-
-        <!-- Progress Statistics -->
-        <div class="progress-stats">
-            <div class="progress-card quizzes-taken">
-                <i class="fas fa-clipboard-check progress-icon"></i>
-                <div class="progress-number" th:text="${quizzesTaken ?: 0}">0</div>
-                <div class="progress-label">Quizzes Taken</div>
-            </div>
-            <div class="progress-card average-score">
-                <i class="fas fa-chart-line progress-icon"></i>
-                <div class="progress-number" th:text="${averageScore ?: '0%'}">0%</div>
-                <div class="progress-label">Average Score</div>
-            </div>
-            <div class="progress-card total-time">
-                <i class="fas fa-clock progress-icon"></i>
-                <div class="progress-number" th:text="${totalTimeSpent ?: '0h'}">0h</div>
-                <div class="progress-label">Time Spent</div>
-            </div>
-            <div class="progress-card achievements">
-                <i class="fas fa-trophy progress-icon"></i>
-                <div class="progress-number" th:text="${achievementsCount ?: 0}">0</div>
-                <div class="progress-label">Achievements</div>
+    <!-- NAVIGATION -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <i class="fas fa-brain"></i>
+                QWIZZ
+            </a>
+            
+            <div class="nav-menu">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/student/quizzes" class="nav-link">Browse Quizzes</a>
+                <a href="/student/dashboard" class="nav-link">Dashboard</a>
+                <a href="/student/attempts" class="nav-link">My Attempts</a>
+                <a href="/auth/logout" class="nav-link">Logout</a>
             </div>
         </div>
+    </nav>
 
-        <div class="row">
-            <!-- Available Quizzes -->
-            <div class="col-md-8">
-                <div class="dashboard-card">
-                    <h4><i class="fas fa-list"></i> Available Quizzes</h4>
-                    
-                    <div th:if="${availableQuizzes != null and !availableQuizzes.empty}">
-                        <div class="quiz-card" th:each="quiz : ${availableQuizzes}">
-                            <div class="quiz-card-header">
-                                <div class="quiz-title" th:text="${quiz.title}">Quiz Title</div>
-                                <div class="quiz-meta">
-                                    <span><i class="fas fa-question-circle"></i> <span th:text="${quiz.questions.size()}">5</span> Questions</span>
-                                    <span><i class="fas fa-clock"></i> <span th:text="${quiz.timeLimit ?: 'No Limit'}">30 min</span></span>
-                                    <span><i class="fas fa-user"></i> <span th:text="${quiz.createdBy.firstName + ' ' + quiz.createdBy.lastName}">Teacher Name</span></span>
-                                </div>
-                            </div>
-                            <div class="quiz-card-body">
-                                <p class="quiz-description" th:text="${quiz.description}">Quiz description goes here...</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="difficulty-badge"
-                                          th:text="${quiz.difficulty}">Medium</span>
-                                    <div class="quiz-actions">
-                                        <div th:if="${quiz.userAttempt != null}">
-                                            <span class="quiz-status status-completed">Completed</span>
-                                            <a th:href="@{/student/quiz/{id}/results(id=${quiz.id})}" class="btn">
-                                                <i class="fas fa-chart-bar"></i> View Results
-                                            </a>
-                                        </div>
-                                        <div th:if="${quiz.userAttempt == null}">
-                                            <a th:href="@{/student/quiz/{id}/take(id=${quiz.id})}" class="btn">
-                                                <i class="fas fa-play"></i> Take Quiz
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                WELCOME BACK, <span th:text="${student.firstName}">STUDENT</span>!
+            </h1>
+            <p class="hero-subtitle">READY TO DOMINATE SOME QUIZZES?</p>
+        </div>
+    </section>
+
+    <div class="main-container">
+        <!-- STATISTICS -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card quizzes">
+                    <div class="stat-icon">
+                        <i class="fas fa-brain"></i>
                     </div>
-                    
-                    <div th:if="${availableQuizzes == null or availableQuizzes.empty}" class="empty-state">
+                    <div class="stat-number" th:text="${totalQuizzes ?: '0'}">12</div>
+                    <div class="stat-label">QUIZZES AVAILABLE</div>
+                </div>
+
+                <div class="stat-card score">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-number" th:text="${averageScore != null ? averageScore + '%' : '0%'}">85%</div>
+                    <div class="stat-label">AVERAGE SCORE</div>
+                </div>
+
+                <div class="stat-card completed">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-number" th:text="${completedQuizzes ?: '0'}">8</div>
+                    <div class="stat-label">COMPLETED</div>
+                </div>
+
+                <div class="stat-card rank">
+                    <div class="stat-icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <div class="stat-number" th:text="${userRank ?: '#1'}">#5</div>
+                    <div class="stat-label">YOUR RANK</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN CONTENT -->
+        <div class="content-grid">
+            <!-- AVAILABLE QUIZZES -->
+            <section class="quiz-section">
+                <h2 class="section-title">
+                    <i class="fas fa-graduation-cap"></i>
+                    AVAILABLE QUIZZES
+                </h2>
+
+                <div class="quiz-grid">
+                    <div th:if="${#lists.isEmpty(quizzes)}" class="empty-state">
                         <i class="fas fa-clipboard-list"></i>
-                        <h5>No Quizzes Available</h5>
-                        <p>Check back later for new quizzes from your teachers.</p>
+                        <h3>NO QUIZZES AVAILABLE!</h3>
+                        <p>Check back later for new challenges!</p>
                     </div>
-                </div>
-            </div>
 
-            <!-- Sidebar -->
-            <div class="col-md-4">
-                <!-- Recent Attempts -->
-                <div class="dashboard-card">
-                    <h4><i class="fas fa-history"></i> Recent Attempts</h4>
-                    <div class="recent-attempts">
-                        <div th:if="${recentAttempts != null and !recentAttempts.empty}">
-                            <div class="attempt-item" th:each="attempt : ${recentAttempts}">
-                                <div>
-                                    <div class="attempt-quiz" th:text="${attempt.quiz.title}">Quiz Title</div>
-                                    <div class="attempt-date" th:text="${#temporals.format(attempt.completedAt, 'MMM dd, yyyy')}">Jan 15, 2024</div>
-                                </div>
-                                <div class="attempt-score"
-                                     th:text="${attempt.percentage + '%'}">85%</div>
-                            </div>
-                        </div>
-                        
-                        <div th:if="${recentAttempts == null or recentAttempts.empty}" class="empty-state">
-                            <i class="fas fa-chart-line"></i>
-                            <p>No quiz attempts yet</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Progress Tracking -->
-                <div class="dashboard-card">
-                    <h4><i class="fas fa-chart-pie"></i> Learning Progress</h4>
-                    <div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span>Quiz Completion</span>
-                                <span th:text="${completionPercentage ?: 0} + '%'">0%</span>
-                            </div>
-                            <div class="progress-bar-custom">
-                                <div class="progress-fill" th:style="'width: ' + ${completionPercentage ?: 0} + '%'"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span>Average Performance</span>
-                                <span th:text="${averageScore ?: '0%'}">0%</span>
-                            </div>
-                            <div class="progress-bar-custom">
-                                <div class="progress-fill" th:style="'width: ' + ${averageScore?.replace('%', '') ?: 0} + '%'"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="text-center mt-3">
-                            <small>Keep up the great work!</small>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Achievements -->
-                <div class="dashboard-card">
-                    <h4><i class="fas fa-trophy"></i> Achievements</h4>
-                    <div th:if="${achievements != null and !achievements.empty}">
-                        <div th:each="achievement : ${achievements}">
-                            <span class="achievement-badge">
-                                <i class="fas fa-medal"></i>
-                                <span th:text="${achievement.name}">Achievement Name</span>
+                    <div th:each="quiz : ${quizzes}" class="quiz-card">
+                        <h3 class="quiz-title" th:text="${quiz.title}">Sample Quiz</h3>
+                        <div class="quiz-meta">
+                            <span>
+                                <i class="fas fa-user"></i>
+                                BY: CREATOR
+                            </span>
+                            <span>
+                                <i class="fas fa-clock"></i>
+                                <span th:text="${quiz.timeLimit} + ' MIN'">30 MIN</span>
                             </span>
                         </div>
-                    </div>
-                    
-                    <div th:if="${achievements == null or achievements.empty}" class="empty-state">
-                        <i class="fas fa-trophy"></i>
-                        <p>Earn achievements by taking quizzes!</p>
-                        <small>Complete your first quiz to get started</small>
+                        <p class="quiz-description" th:text="${quiz.description}">
+                            Test your knowledge with this comprehensive quiz covering various topics.
+                        </p>
+                        <div>
+                            <span th:class="'difficulty-badge difficulty-' + ${quiz.difficulty != null ? quiz.difficulty.toString().toLowerCase() : 'medium'}" 
+                                  th:text="${quiz.difficulty ?: 'MEDIUM'}">MEDIUM</span>
+                        </div>
+                        <div class="quiz-actions">
+                            <a th:href="@{/student/quiz/{id}(id=${quiz.id})}" class="btn btn-primary">
+                                <i class="fas fa-play"></i>
+                                START QUIZ
+                            </a>
+                            <a th:href="@{/student/quiz/{id}(id=${quiz.id})}" class="btn btn-secondary">
+                                <i class="fas fa-info-circle"></i>
+                                DETAILS
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- SIDEBAR -->
+            <aside class="sidebar">
+                <!-- PROGRESS -->
+                <div class="sidebar-card">
+                    <h3>
+                        <i class="fas fa-chart-line"></i>
+                        YOUR PROGRESS
+                    </h3>
+                    
+                    <div class="progress-item">
+                        <div class="progress-info">
+                            <span>QUIZ COMPLETION</span>
+                            <span th:text="${(completedQuizzes ?: 0)} + '/' + ${(totalQuizzes ?: 0)}">8/12</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" th:style="'width: ' + ${totalQuizzes != null && totalQuizzes > 0 ? (completedQuizzes * 100.0 / totalQuizzes) : 0} + '%'"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-info">
+                            <span>AVERAGE SCORE</span>
+                            <span th:text="${averageScore != null ? averageScore + '%' : '0%'}">85%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" th:style="'width: ' + ${averageScore ?: 0} + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECENT ACTIVITY -->
+                <div class="sidebar-card">
+                    <h3>
+                        <i class="fas fa-history"></i>
+                        RECENT ACTIVITY
+                    </h3>
+                    
+                    <ul class="activity-list">
+                        <li class="activity-item" th:if="${#lists.isEmpty(recentAttempts)}">
+                            <div class="activity-icon">
+                                <i class="fas fa-info"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">NO RECENT ACTIVITY</div>
+                                <div class="activity-time">START TAKING QUIZZES!</div>
+                            </div>
+                        </li>
+                        
+                        <li th:each="attempt : ${recentAttempts}" class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-trophy" th:if="${attempt.completed}"></i>
+                                <i class="fas fa-clock" th:unless="${attempt.completed}"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">
+                                    <span th:if="${attempt.completed}">COMPLETED QUIZ</span>
+                                    <span th:unless="${attempt.completed}">STARTED QUIZ</span>
+                                </div>
+                                <div class="activity-time">
+                                    SCORE: <span th:text="${attempt.score ?: 0}">85</span>%
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
         </div>
     </div>
-
-    <script layout:fragment="scripts">
-        document.addEventListener('DOMContentLoaded', function() {
-            // Animate progress numbers
-            const progressNumbers = document.querySelectorAll('.progress-number');
-            progressNumbers.forEach(num => {
-                const value = parseInt(num.textContent) || 0;
-                let current = 0;
-                const increment = Math.ceil(value / 20);
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= value) {
-                        current = value;
-                        clearInterval(timer);
-                    }
-                    num.textContent = current + (num.textContent.includes('%') ? '%' : 
-                                                  num.textContent.includes('h') ? 'h' : '');
-                }, 50);
-            });
-
-            // Animate progress bars
-            setTimeout(() => {
-                const progressBars = document.querySelectorAll('.progress-fill');
-                progressBars.forEach(bar => {
-                    const width = bar.style.width;
-                    bar.style.width = '0%';
-                    setTimeout(() => {
-                        bar.style.width = width;
-                    }, 100);
-                });
-            }, 500);
-        });
-    </script>
 </body>
 </html>
