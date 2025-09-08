@@ -240,6 +240,21 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/api/check-username")
+    @ResponseBody
+    public ResponseEntity<Map<String, Boolean>> checkUsernameAvailability(@RequestParam String username) {
+        try {
+            boolean available = userService.isUsernameAvailable(username);
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("available", available);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Boolean> error = new HashMap<>();
+            error.put("available", false);
+            return ResponseEntity.ok(error);
+        }
+    }
+
     @GetMapping("/forgot-password")
     public String forgotPasswordPage(Model model) {
         model.addAttribute("pageTitle", "Forgot Password - QWIZZ");

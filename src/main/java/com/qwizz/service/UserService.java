@@ -125,6 +125,20 @@ public class UserService implements UserDetailsService {
         return userRepository.existsByEmail(email);
     }
 
+    public boolean isUsernameAvailable(String username) {
+        if (username == null || username.trim().isEmpty() || username.trim().length() < 3) {
+            return false;
+        }
+        return !userRepository.existsByUsername(username.trim());
+    }
+
+    public boolean isEmailAvailable(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+        return !userRepository.existsByEmail(email.trim());
+    }
+
     public List<User> getUsersByRole(com.qwizz.model.Role role) {
         return userRepository.findByRoleAndActiveTrue(role);
     }
