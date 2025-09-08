@@ -3,6 +3,7 @@ package com.qwizz.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,6 +11,8 @@ public class DatabaseInitializer implements CommandLineRunner {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public void run(String... args) throws Exception {
@@ -24,7 +27,7 @@ public class DatabaseInitializer implements CommandLineRunner {
             jdbcTemplate.execute("DROP TABLE IF EXISTS quizzes");
             jdbcTemplate.execute("DROP TABLE IF EXISTS users");
 
-            // Create users table
+            // Create users table with role column included from the start
             jdbcTemplate.execute("""
                         CREATE TABLE users (
                             id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -33,11 +36,13 @@ public class DatabaseInitializer implements CommandLineRunner {
                             password VARCHAR(255) NOT NULL,
                             first_name VARCHAR(50) NOT NULL,
                             last_name VARCHAR(50) NOT NULL,
+                            role ENUM('TEACHER', 'STUDENT', 'ADMIN') DEFAULT 'STUDENT',
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                             active BOOLEAN DEFAULT TRUE,
                             INDEX idx_username (username),
                             INDEX idx_email (email),
+                            INDEX idx_role (role),
                             INDEX idx_active (active)
                         )
                     """);
@@ -126,21 +131,20 @@ public class DatabaseInitializer implements CommandLineRunner {
             Integer userCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
 
             if (userCount == null || userCount == 0) {
-                // Insert sample users (password is 'password123' encrypted with BCrypt)
-                // BCrypt hash for "password123"
-                String hashedPassword = "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.";
+                // Insert sample users with roles (password is 'password123' encrypted with BCrypt)
+                // Generate proper BCrypt hash for "password123"
+                String hashedPassword = passwordEncoder.encode("password123");
+
+                // Insert users with roles directly
+                jdbcTemplate.update(
+                        "INSERT INTO users (username, email, password, first_name, last_name, role) VALUES (?, ?, ?, ?, ?, ?)",
+                        "john_doe", "john@qwizz.com", hashedPassword, "John", "Doe", "TEACHER");
 
                 jdbcTemplate.update(
-                        "INSERT INTO users (username, email, password, first_name, last_name) VALUES (?, ?, ?, ?, ?)",
-                        "admin", "admin@qwizz.com", hashedPassword, "Admin", "User");
+                        "INSERT INTO users (username, email, password, first_name, last_name, role) VALUES (?, ?, ?, ?, ?, ?)",
+                        "jane_smith", "jane@qwizz.com", hashedPassword, "Jane", "Smith", "STUDENT");
 
-                jdbcTemplate.update(
-                        "INSERT INTO users (username, email, password, first_name, last_name) VALUES (?, ?, ?, ?, ?)",
-                        "john_doe", "john@qwizz.com", hashedPassword, "John", "Doe");
-
-                jdbcTemplate.update(
-                        "INSERT INTO users (username, email, password, first_name, last_name) VALUES (?, ?, ?, ?, ?)",
-                        "jane_smith", "jane@qwizz.com", hashedPassword, "Jane", "Smith");
+                System.out.println("Sample users created successfully with roles!");
 
                 // Insert sample quizzes
                 jdbcTemplate.update(
@@ -150,7 +154,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
                 jdbcTemplate.update(
                         "INSERT INTO quizzes (title, description, creator_id, difficulty, time_limit, is_public) VALUES (?, ?, ?, ?, ?, ?)",
-                        "Science Quiz", "Challenge yourself with these science questions", 2, "MEDIUM", 20, true);
+                        "Science Quiz", "Challenge yourself with these science questions", 1, "MEDIUM", 20, true);
 
                 jdbcTemplate.update(
                         "INSERT INTO quizzes (title, description, creator_id, difficulty, time_limit, is_public) VALUES (?, ?, ?, ?, ?, ?)",

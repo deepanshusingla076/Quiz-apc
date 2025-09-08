@@ -2,8 +2,7 @@ package com.qwizz.model;
 
 public enum Role {
     TEACHER("TEACHER"),
-    STUDENT("STUDENT"),
-    ADMIN("ADMIN");
+    STUDENT("STUDENT");
 
     private final String value;
 

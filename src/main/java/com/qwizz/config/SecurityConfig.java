@@ -54,6 +54,7 @@ public class SecurityConfig {
                 // Public endpoints
                 .requestMatchers("/", "/home", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/forgot-password").permitAll()
                 
                 // Teacher endpoints
                 .requestMatchers("/teacher/**").hasRole("TEACHER")
@@ -67,19 +68,22 @@ public class SecurityConfig {
                 // All other requests require authentication
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/dashboard", true)
-                .failureUrl("/login?error=true")
-                .permitAll()
-            )
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
                 .deleteCookies("jwt-token")
                 .invalidateHttpSession(true)
                 .permitAll()
+            )
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    // Redirect to login page for unauthenticated users
+                    response.sendRedirect("/login");
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    // Redirect to login page for access denied
+                    response.sendRedirect("/login");
+                })
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

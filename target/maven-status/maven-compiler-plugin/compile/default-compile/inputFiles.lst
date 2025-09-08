@@ -5,6 +5,7 @@ C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\config\JwtUtil.jav
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\config\DatabaseInitializer.java
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\controller\StudentController.java
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\service\QuizAttemptService.java
+C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\config\PostStartupRoleUpdater.java
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\config\JwtAuthenticationFilter.java
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\controller\HomeController.java
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\repository\QuizRepository.java
@@ -13,6 +14,7 @@ C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\service\QuestionBa
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\service\ResultService.java
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\controller\AuthController.java
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\model\Question.java
+C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\controller\AdminController.java
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\model\Role.java
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\service\UserService.java
 C:\Users\deepa\OneDrive\Desktop\qwizz\src\main\java\com\qwizz\model\QuestionType.java

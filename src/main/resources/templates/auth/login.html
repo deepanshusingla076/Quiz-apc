@@ -144,6 +144,34 @@
         a.accent:hover {
             color: var(--accent);
         }
+
+        /* Alert Messages */
+        .alert {
+            padding: var(--space-md);
+            border: var(--border-thick);
+            margin-bottom: var(--space-md);
+            font-weight: 700;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .alert-error {
+            background: #FFE5E5;
+            color: var(--black);
+            border-color: #FF0000;
+        }
+
+        .alert-success {
+            background: #E5FFE5;
+            color: var(--black);
+            border-color: #00AA00;
+        }
+
+        .alert i {
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
@@ -158,6 +186,18 @@
                     <p style="color: var(--gray); font-weight: 700; font-size: 0.9rem;">
                         Welcome back! Continue your learning journey.
                     </p>
+                </div>
+
+                <!-- Error Message -->
+                <div th:if="${errorMessage}" class="alert alert-error mb-md">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span th:text="${errorMessage}"></span>
+                </div>
+
+                <!-- Success Message -->
+                <div th:if="${successMessage}" class="alert alert-success mb-md">
+                    <i class="fas fa-check-circle"></i>
+                    <span th:text="${successMessage}"></span>
                 </div>
                 
                 <!-- Form -->

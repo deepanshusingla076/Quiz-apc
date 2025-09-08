@@ -44,7 +44,8 @@ public class AuthController {
                        @RequestParam String password,
                        @RequestParam(required = false) String role,
                        HttpServletResponse response,
-                       RedirectAttributes redirectAttributes) {
+                       RedirectAttributes redirectAttributes,
+                       Model model) {
         try {
             // Authenticate user
             Authentication authentication = authenticationManager.authenticate(
@@ -57,9 +58,10 @@ public class AuthController {
             // Validate role if specified
             if (role != null && !role.isEmpty()) {
                 if (!user.getRole().toString().equalsIgnoreCase(role)) {
-                    redirectAttributes.addFlashAttribute("errorMessage", 
+                    model.addAttribute("errorMessage", 
                         "Invalid role. Please select the correct role for your account.");
-                    return "redirect:/login";
+                    model.addAttribute("pageTitle", "Login - QWIZZ");
+                    return "auth/login";
                 }
             }
 
@@ -83,12 +85,13 @@ public class AuthController {
             return switch (user.getRole()) {
                 case TEACHER -> "redirect:/teacher/dashboard";
                 case STUDENT -> "redirect:/student/dashboard";
-                case ADMIN -> "redirect:/admin/dashboard";
+                default -> "redirect:/dashboard"; // Fallback for any other roles
             };
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Invalid username or password");
-            return "redirect:/login";
+            model.addAttribute("errorMessage", "Invalid username or password");
+            model.addAttribute("pageTitle", "Login - QWIZZ");
+            return "auth/login";
         }
     }
 
@@ -168,7 +171,7 @@ public class AuthController {
             return switch (user.getRole()) {
                 case TEACHER -> "redirect:/teacher/dashboard";
                 case STUDENT -> "redirect:/student/dashboard";
-                case ADMIN -> "redirect:/admin/dashboard";
+                default -> "redirect:/dashboard"; // Fallback for any other roles
             };
         }
         return "redirect:/login";

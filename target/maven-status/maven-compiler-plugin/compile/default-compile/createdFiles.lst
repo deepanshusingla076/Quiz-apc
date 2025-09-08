@@ -7,9 +7,11 @@ com\qwizz\service\ResultService.class
 com\qwizz\model\Role.class
 com\qwizz\model\QuizAttempt.class
 com\qwizz\config\JwtUtil.class
+com\qwizz\controller\AdminController.class
 com\qwizz\controller\QuizController.class
 com\qwizz\config\JwtAuthenticationFilter.class
 com\qwizz\service\ResultService$LeaderboardEntry.class
+com\qwizz\config\PostStartupRoleUpdater.class
 com\qwizz\model\Question.class
 com\qwizz\service\ResultService$StudentAnalytics.class
 com\qwizz\service\QuestionBankService$QuestionStats.class
