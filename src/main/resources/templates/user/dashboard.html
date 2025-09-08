@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Dashboard - QWIZZ</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        .dashboard {
+            padding: var(--space-xl) 0;
+            background: var(--light);
+            min-height: 80vh;
+        }
+        
+        .dashboard-header {
+            background: var(--white);
+            border: var(--border-thick);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: var(--shadow-card);
+        }
+        
+        .welcome-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-lg);
+        }
+        
+        .welcome-text h1 {
+            color: var(--primary);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .welcome-text p {
+            color: var(--gray);
+            margin-bottom: 0;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .stat-card {
+            background: var(--white);
+            border: var(--border-thick);
+            padding: var(--space-xl);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: var(--shadow-brutal);
+        }
+        
+        .stat-card:nth-child(1) { background: var(--brutal-pink); color: var(--white); }
+        .stat-card:nth-child(2) { background: var(--brutal-cyan); color: var(--black); }
+        .stat-card:nth-child(3) { background: var(--brutal-yellow); color: var(--black); }
+        .stat-card:nth-child(4) { background: var(--brutal-green); color: var(--black); }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-md);
+        }
+        
+        .stat-number {
+            font-family: var(--font-primary);
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .stat-label {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .dashboard-section {
+            background: var(--white);
+            border: var(--border-thick);
+            margin-bottom: var(--space-xl);
+            box-shadow: var(--shadow-card);
+        }
+        
+        .section-header {
+            background: var(--dark);
+            color: var(--white);
+            padding: var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .section-content {
+            padding: var(--space-xl);
+        }
+        
+        .quiz-grid, .attempt-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--space-lg);
+        }
+        
+        .quiz-card, .attempt-card {
+            border: var(--border-thin);
+            padding: var(--space-lg);
+            background: var(--light);
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-card:hover, .attempt-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-small);
+            background: var(--white);
+        }
+        
+        .quiz-title, .attempt-title {
+            font-weight: 900;
+            margin-bottom: var(--space-sm);
+            color: var(--primary);
+        }
+        
+        .quiz-meta, .attempt-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .quiz-actions, .attempt-actions {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+        
+        .btn-small {
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.9rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: var(--space-xxl);
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: var(--space-lg);
+            color: var(--gray);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--light);
+            border: 2px solid var(--black);
+            margin-top: var(--space-sm);
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .welcome-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .quiz-grid, .attempt-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/" class="nav-brand">
+                    <i class="fas fa-brain"></i>
+                    QWIZZ
+                </a>
+            </div>
+            
+            <div class="nav-menu" id="nav-menu">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/quiz/browse" class="nav-link">Browse Quizzes</a>
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/quiz/create" class="nav-link">Create Quiz</a>
+                <a href="/quiz/ai-generate" class="nav-link">AI Generator</a>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-trigger">
+                        <i class="fas fa-user"></i>
+                        <span th:text="${firstName}">User</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="/user/profile" class="dropdown-item">Profile</a>
+                        <a href="/user/attempts" class="dropdown-item">My Attempts</a>
+                        <a href="/user/quizzes" class="dropdown-item">My Quizzes</a>
+                        <hr class="dropdown-divider">
+                        <a href="/auth/logout" class="dropdown-item">Logout</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-toggle" id="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div th:if="${successMessage}" class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${successMessage}"></span>
+        <button class="alert-close">&times;</button>
+    </div>
+
+    <div class="dashboard">
+        <div class="container">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div class="welcome-section">
+                    <div class="welcome-text">
+                        <h1>Welcome back, <span th:text="${firstName}">User</span>! 🎉</h1>
+                        <p>Ready to create some amazing quizzes or challenge yourself today?</p>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <a href="/quiz/create" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Create Quiz
+                        </a>
+                        <a href="/quiz/ai-generate" class="btn btn-accent">
+                            <i class="fas fa-magic"></i>
+                            AI Generator
+                        </a>
+                        <a href="/quiz/browse" class="btn btn-secondary">
+                            <i class="fas fa-search"></i>
+                            Browse Quizzes
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="stat-number" th:text="${totalQuizzes}">0</div>
+                    <div class="stat-label">Quizzes Created</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="stat-number" th:text="${totalAttempts}">0</div>
+                    <div class="stat-label">Quiz Attempts</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="stat-number" th:text="${completedAttempts}">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-number" th:text="${averageScore} + '%'">0%</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+            </div>
+            
+            <!-- My Quizzes -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-brain"></i>
+                        My Quizzes
+                    </h2>
+                    <a href="/user/quizzes" class="btn btn-secondary btn-small">View All</a>
+                </div>
+                
+                <div class="section-content">
+                    <div th:if="${#lists.isEmpty(userQuizzes)}" class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>No Quizzes Yet</h3>
+                        <p>Start creating your first quiz today!</p>
+                        <a href="/quiz/create" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Create Your First Quiz
+                        </a>
+                    </div>
+                    
+                    <div th:unless="${#lists.isEmpty(userQuizzes)}" class="quiz-grid">
+                        <div th:each="quiz, iterStat : ${userQuizzes}" th:if="${iterStat.index < 6}" class="quiz-card">
+                            <h3 class="quiz-title" th:text="${quiz.title}">Quiz Title</h3>
+                            <div class="quiz-meta">
+                                <span th:text="${quiz.difficulty}">Difficulty</span>
+                                <span th:text="${#temporals.format(quiz.createdAt, 'MMM dd, yyyy')}">Date</span>
+                            </div>
+                            <p th:text="${quiz.description}" class="mb-md">Quiz description goes here...</p>
+                            <div class="quiz-actions">
+                                <a th:href="@{/quiz/edit/{id}(id=${quiz.id})}" class="btn btn-primary btn-small">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </a>
+                                <a th:href="@{/quiz/{id}(id=${quiz.id})}" class="btn btn-secondary btn-small">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Attempts -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i>
+                        Recent Attempts
+                    </h2>
+                    <a href="/user/attempts" class="btn btn-secondary btn-small">View All</a>
+                </div>
+                
+                <div class="section-content">
+                    <div th:if="${#lists.isEmpty(userAttempts)}" class="empty-state">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>No Quiz Attempts Yet</h3>
+                        <p>Take your first quiz to see your progress here!</p>
+                        <a href="/quiz/browse" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                            Browse Quizzes
+                        </a>
+                    </div>
+                    
+                    <div th:unless="${#lists.isEmpty(userAttempts)}" class="attempt-grid">
+                        <div th:each="attempt, iterStat : ${userAttempts}" th:if="${iterStat.index < 6}" class="attempt-card">
+                            <h4 class="attempt-title">Quiz Attempt #<span th:text="${attempt.id}">1</span></h4>
+                            <div class="attempt-meta">
+                                <span th:text="${attempt.status}">Status</span>
+                                <span th:text="${#temporals.format(attempt.startTime, 'MMM dd, yyyy')}">Date</span>
+                            </div>
+                            <div class="progress-section">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>Score: <strong th:text="${attempt.score}">0</strong></span>
+                                    <span th:text="${#numbers.formatDecimal(attempt.percentage, 1, 1)} + '%'">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" th:style="'width: ' + ${attempt.percentage} + '%'"></div>
+                                </div>
+                            </div>
+                            <div class="attempt-actions mt-md">
+                                <span class="btn btn-secondary btn-small" style="opacity: 0.7; cursor: default;">
+                                    <i class="fas fa-clock"></i>
+                                    <span th:text="${attempt.correctAnswers} + '/' + ${attempt.totalQuestions}">0/0</span> Correct
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>QWIZZ</h3>
+                <p>Interactive quiz platform with AI-powered quiz generation</p>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/quiz/browse">Browse Quizzes</a></li>
+                    <li><a href="/quiz/create">Create Quiz</a></li>
+                    <li><a href="/quiz/ai-generate">AI Generator</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 QWIZZ. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register - QWIZZ Brutalist Enhanced</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --primary: #FF6B35;
+    --brutal-pink: #FF3366;
+    --secondary: #00D2FF;
+    --accent: #FFE66D;
+    --success: #00F5A0;
+    --warning: #FFB627;
+    --error: #FF5E5B;
+    --dark: #1A1B23;
+    --light: #F8F9FA;
+    --white: #FFFFFF;
+    --black: #000000;
+
+    --font-primary: 'Arial Black', Arial, sans-serif;
+    --font-secondary: 'Arial', sans-serif;
+
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+
+    --border-thick: 4px solid var(--black);
+    --border-thin: 2px solid var(--black);
+
+    --shadow-brutal: 8px 8px 0px var(--black);
+    --shadow-small: 4px 4px 0px var(--black);
+    --shadow-card: 6px 6px 0px var(--black);
+}
+
+/* --- Body --- */
+body {
+    font-family: var(--font-secondary);
+    background-color: var(--light);
+    color: var(--dark);
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Auth Container --- */
+.auth-container {
+    min-height: 35vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+}
+
+.auth-card {
+    background: var(--white);
+    border: var(--border-thick);
+    padding: var(--space-xl);
+    max-width: 600px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    box-shadow: var(--shadow-card);
+}
+
+/* --- Header --- */
+.auth-header h2 {
+    font-family: var(--font-primary);
+    font-size: 2.5rem;
+    color: var(--primary);
+    text-transform: uppercase;
+    margin-bottom: var(--space-sm);
+}
+
+.auth-header p {
+    color: var(--dark);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* --- Form --- */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.form-row {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-label {
+    font-weight: 900;
+    font-family: var(--font-primary);
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    color: var(--dark);
+}
+
+.form-control {
+    border: var(--border-thin);
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: var(--light);
+    color: var(--dark);
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border: var(--border-thick);
+    outline: none;
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-small);
+}
+
+/* --- Role Selector --- */
+.role-selector {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.role-option {
+    flex: 1;
+    padding: var(--space-sm);
+    border: var(--border-thin);
+    background: var(--light);
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.role-option.selected,
+.role-option:hover {
+    border: var(--border-thick);
+    background: var(--primary);
+    color: var(--white);
+    box-shadow: var(--shadow-small);
+    transform: translate(-2px, -2px);
+}
+
+/* --- Password Strength --- */
+.password-strength {
+    height: 8px;
+    border-radius: 0;
+    margin-top: 8px;
+    background: #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.strength-weak { background: linear-gradient(90deg, #ff5e5b 0%, #ff8a80 100%); width: 33%; }
+.strength-medium { background: linear-gradient(90deg, #ffb627 0%, #ffd54f 100%); width: 66%; }
+.strength-strong { background: linear-gradient(90deg, #00f5a0 0%, #66bb6a 100%); width: 100%; }
+
+/* --- Button --- */
+.btn-auth {
+    background: var(--primary);
+    color: var(--white);
+    padding: 14px 0;
+    font-family: var(--font-primary);
+    font-weight: 900;
+    text-transform: uppercase;
+    border: var(--border-thick);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.1rem;
+}
+
+.btn-auth:hover {
+    background: var(--brutal-pink);
+    transform: translate(-4px, -4px);
+    box-shadow: var(--shadow-brutal);
+}
+
+/* --- Footer --- */
+.auth-footer {
+    margin-top: var(--space-md);
+    text-align: center;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.auth-footer a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.auth-footer a:hover {
+    color: var(--brutal-pink);
+    text-decoration: underline;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+    .form-row {
+        flex-direction: column;
+    }
+    .role-selector {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2><i class="fas fa-user-plus"></i> Join QWIZZ</h2>
+            <p>Create your account and start your learning journey</p>
+        </div>
+
+        <form id="registerForm" action="/register" method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="firstName">First Name</label>
+                    <input type="text" id="firstName" name="firstName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="lastName">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" required minlength="3">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Account Type</label>
+                <div class="role-selector">
+                    <label class="role-option" for="teacher">
+                        <input type="radio" id="teacher" name="role" value="TEACHER"> Teacher
+                    </label>
+                    <label class="role-option selected" for="student">
+                        <input type="radio" id="student" name="role" value="STUDENT" checked> Student
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required minlength="6">
+                <div class="password-strength" id="passwordStrength"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required minlength="6">
+            </div>
+
+            <button type="submit" class="btn-auth">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a href="/login">Sign in</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Role selection
+const roleOptions = document.querySelectorAll('.role-option');
+roleOptions.forEach(option => {
+    option.addEventListener('click', () => {
+        roleOptions.forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+        option.querySelector('input[type="radio"]').checked = true;
+    });
+});
+
+// Password strength
+const passwordField = document.getElementById('password');
+const strengthIndicator = document.getElementById('passwordStrength');
+
+passwordField.addEventListener('input', () => {
+    const val = passwordField.value;
+    let strength = 0;
+    if (val.length >= 6) strength++;
+    if (/[A-Z]/.test(val)) strength++;
+    if (/[0-9]/.test(val)) strength++;
+    strengthIndicator.className = 'password-strength';
+    if (strength >= 3) strengthIndicator.classList.add('strength-strong');
+    else if (strength >= 2) strengthIndicator.classList.add('strength-medium');
+    else if (strength >= 1) strengthIndicator.classList.add('strength-weak');
+});
+
+// Confirm password
+const confirmField = document.getElementById('confirmPassword');
+function validatePasswords() {
+    if (confirmField.value && passwordField.value !== confirmField.value) {
+        confirmField.setCustomValidity('Passwords do not match');
+        confirmField.style.borderColor = '#dc3545';
+    } else {
+        confirmField.setCustomValidity('');
+        confirmField.style.borderColor = '';
+    }
+}
+passwordField.addEventListener('input', validatePasswords);
+confirmField.addEventListener('input', validatePasswords);
+</script>
+
+</body>
+</html>

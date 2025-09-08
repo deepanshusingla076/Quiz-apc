@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}">
+<head>
+    <title>Login - QWIZZ</title>
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --secondary: #00c2ff;
+            --accent: #FFE66D;
+            --success: #00F5A0;
+            --warning: #FFB627;
+            --background: #ffffff;
+            --black: #000000;
+            --gray: #808080;
+            --white: #ffffff;
+
+            --font-main: 'Arial Black', sans-serif;
+            --font-body: 'Courier New', monospace;
+
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 2rem;
+
+            --border-thick: 4px solid var(--black);
+            --shadow-brutal: 8px 8px 0 var(--black);
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-body);
+            background: var(--background);
+            color: var(--black);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+        }
+
+        .login-card {
+    border: var(--border-thick);
+    background: var(--white);
+    padding: 1rem 2rem; /* smaller vertical padding, wider horizontal */
+    box-shadow: var(--shadow-brutal);
+    max-width: 450px;  /* wider box */
+    width: 100%;
+    min-height: 400px; /* reduce height */
+}
+
+
+        h2 {
+            font-family: var(--font-main);
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            margin-bottom: var(--space-md);
+        }
+
+        .accent {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+
+        label {
+            font-weight: 900;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: var(--space-sm);
+        }
+
+        /* Shrink input boxes */
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.5rem; /* smaller padding */
+            border: var(--border-thick);
+            font-weight: 700;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            display: inline-block;
+            font-family: var(--font-main);
+            text-transform: uppercase;
+            padding: 0.8rem; /* reduced */
+            border: var(--border-thick);
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        /* Fix hover effect */
+        .btn-primary:hover {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        .btn-large {
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .role-select {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .role-option {
+            flex: 1;
+            border: var(--border-thick);
+            padding: 0.8rem; /* reduced */
+            text-align: center;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-md { margin-bottom: var(--space-md); }
+        .mb-lg { margin-bottom: var(--space-lg); }
+        .mt-md { margin-top: var(--space-md); }
+        .mt-lg { margin-top: var(--space-lg); }
+
+        a {
+            color: var(--secondary);
+            font-weight: 900;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        a.accent:hover {
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+            
+            <div class="login-card">
+                
+                <!-- Header -->
+                <div class="text-center mb-md">
+                    <h2 class="accent"><i class="fas fa-sign-in-alt"></i> Login</h2>
+                    <p style="color: var(--gray); font-weight: 700; font-size: 0.9rem;">
+                        Welcome back! Continue your learning journey.
+                    </p>
+                </div>
+                
+                <!-- Form -->
+                <form action="/login" method="post">
+                    
+                    <div class="form-group mb-md">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" placeholder="Enter username" required>
+                    </div>
+                    
+                    <div class="form-group mb-md">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter password" required>
+                    </div>
+
+                    <!-- Role Selector -->
+                    <div class="form-group mb-md">
+                        <label>Login As</label>
+                        <div class="role-select">
+                            <label class="role-option">
+                                <input type="radio" name="role" value="TEACHER"> Teacher
+                            </label>
+                            <label class="role-option">
+                                <input type="radio" name="role" value="STUDENT"> Student
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-large">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </form>
+                
+                <!-- Forgot password -->
+                <div class="text-center mt-md">
+                    <a href="/forgot-password">Forgot Password?</a>
+                </div>
+                
+                <!-- Footer -->
+                <div class="text-center mt-md">
+                    <p>Don't have an account? 
+                        <a href="/register" class="accent">Create one</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

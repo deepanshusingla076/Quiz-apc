@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}">
+<head>
+    <title>Student Dashboard - QWIZZ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .progress-card {
+            text-align: center;
+            border-radius: 12px;
+            padding: 25px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        
+        .progress-card.quizzes-taken {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .progress-card.average-score {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .progress-card.total-time {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .progress-card.achievements {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .progress-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .progress-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .progress-icon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+        
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .welcome-section h1 {
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .welcome-section p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .quiz-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            margin-bottom: 20px;
+        }
+        
+        .quiz-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .quiz-card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .quiz-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+        
+        .quiz-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .quiz-meta span {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quiz-meta i {
+            margin-right: 5px;
+        }
+        
+        .quiz-card-body {
+            padding: 20px;
+        }
+        
+        .quiz-description {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        
+        .difficulty-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .difficulty-easy {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .difficulty-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .difficulty-hard {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .quiz-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .btn-take-quiz {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-take-quiz:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .btn-view-results {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-view-results:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(67, 233, 123, 0.3);
+            color: white;
+        }
+        
+        .quiz-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-in-progress {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-not-started {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .recent-attempts {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .attempt-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .attempt-item:last-child {
+            border-bottom: none;
+        }
+        
+        .attempt-quiz {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .attempt-score {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .score-excellent {
+            color: #28a745;
+        }
+        
+        .score-good {
+            color: #ffc107;
+        }
+        
+        .score-needs-improvement {
+            color: #dc3545;
+        }
+        
+        .attempt-date {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 5px;
+        }
+        
+        .achievement-badge i {
+            margin-right: 8px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1>Welcome back, <span th:text="${#authentication.principal.firstName}">Student</span>!</h1>
+            <p>Continue your learning journey and test your knowledge with engaging quizzes.</p>
+        </div>
+
+        <!-- Progress Statistics -->
+        <div class="progress-stats">
+            <div class="progress-card quizzes-taken">
+                <i class="fas fa-clipboard-check progress-icon"></i>
+                <div class="progress-number" th:text="${quizzesTaken ?: 0}">0</div>
+                <div class="progress-label">Quizzes Taken</div>
+            </div>
+            <div class="progress-card average-score">
+                <i class="fas fa-chart-line progress-icon"></i>
+                <div class="progress-number" th:text="${averageScore ?: '0%'}">0%</div>
+                <div class="progress-label">Average Score</div>
+            </div>
+            <div class="progress-card total-time">
+                <i class="fas fa-clock progress-icon"></i>
+                <div class="progress-number" th:text="${totalTimeSpent ?: '0h'}">0h</div>
+                <div class="progress-label">Time Spent</div>
+            </div>
+            <div class="progress-card achievements">
+                <i class="fas fa-trophy progress-icon"></i>
+                <div class="progress-number" th:text="${achievementsCount ?: 0}">0</div>
+                <div class="progress-label">Achievements</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Available Quizzes -->
+            <div class="col-md-8">
+                <div class="dashboard-card">
+                    <h4><i class="fas fa-list"></i> Available Quizzes</h4>
+                    
+                    <div th:if="${availableQuizzes != null and !availableQuizzes.empty}">
+                        <div class="quiz-card" th:each="quiz : ${availableQuizzes}">
+                            <div class="quiz-card-header">
+                                <div class="quiz-title" th:text="${quiz.title}">Quiz Title</div>
+                                <div class="quiz-meta">
+                                    <span><i class="fas fa-question-circle"></i> <span th:text="${quiz.questions.size()}">5</span> Questions</span>
+                                    <span><i class="fas fa-clock"></i> <span th:text="${quiz.timeLimit ?: 'No Limit'}">30 min</span></span>
+                                    <span><i class="fas fa-user"></i> <span th:text="${quiz.createdBy.firstName + ' ' + quiz.createdBy.lastName}">Teacher Name</span></span>
+                                </div>
+                            </div>
+                            <div class="quiz-card-body">
+                                <p class="quiz-description" th:text="${quiz.description}">Quiz description goes here...</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="difficulty-badge" 
+                                          th:classappend="${quiz.difficulty.toString().toLowerCase() == 'easy' ? 'difficulty-easy' : 
+                                                           quiz.difficulty.toString().toLowerCase() == 'medium' ? 'difficulty-medium' : 'difficulty-hard'}"
+                                          th:text="${quiz.difficulty}">Medium</span>
+                                    <div class="quiz-actions">
+                                        <!-- Check if student has attempted this quiz -->
+                                        <div th:if="${quiz.userAttempt != null}">
+                                            <span class="quiz-status status-completed">Completed</span>
+                                            <a th:href="@{/student/quiz/{id}/results(id=${quiz.id})}" class="btn btn-view-results btn-sm ms-2">
+                                                <i class="fas fa-chart-bar"></i> View Results
+                                            </a>
+                                        </div>
+                                        <div th:if="${quiz.userAttempt == null}">
+                                            <a th:href="@{/student/quiz/{id}/take(id=${quiz.id})}" class="btn btn-take-quiz btn-sm">
+                                                <i class="fas fa-play"></i> Take Quiz
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${availableQuizzes == null or availableQuizzes.empty}" class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h5>No Quizzes Available</h5>
+                        <p>Check back later for new quizzes from your teachers.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Attempts & Achievements -->
+            <div class="col-md-4">
+                <!-- Recent Attempts -->
+                <div class="dashboard-card">
+                    <h4><i class="fas fa-history"></i> Recent Attempts</h4>
+                    <div class="recent-attempts">
+                        <div th:if="${recentAttempts != null and !recentAttempts.empty}">
+                            <div class="attempt-item" th:each="attempt : ${recentAttempts}">
+                                <div>
+                                    <div class="attempt-quiz" th:text="${attempt.quiz.title}">Quiz Title</div>
+                                    <div class="attempt-date" th:text="${#temporals.format(attempt.completedAt, 'MMM dd, yyyy')}">Jan 15, 2024</div>
+                                </div>
+                                <div class="attempt-score" 
+                                     th:classappend="${attempt.percentage >= 80 ? 'score-excellent' : 
+                                                      attempt.percentage >= 60 ? 'score-good' : 'score-needs-improvement'}"
+                                     th:text="${attempt.percentage + '%'}">85%</div>
+                            </div>
+                        </div>
+                        
+                        <div th:if="${recentAttempts == null or recentAttempts.empty}" class="empty-state">
+                            <i class="fas fa-chart-line"></i>
+                            <p>No quiz attempts yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Tracking -->
+                <div class="dashboard-card">
+                    <h4><i class="fas fa-chart-pie"></i> Learning Progress</h4>
+                    <div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Quiz Completion</span>
+                                <span th:text="${completionPercentage ?: 0} + '%'">0%</span>
+                            </div>
+                            <div class="progress-bar-custom">
+                                <div class="progress-fill" th:style="'width: ' + ${completionPercentage ?: 0} + '%'"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Average Performance</span>
+                                <span th:text="${averageScore ?: '0%'}">0%</span>
+                            </div>
+                            <div class="progress-bar-custom">
+                                <div class="progress-fill" th:style="'width: ' + ${averageScore?.replace('%', '') ?: 0} + '%'"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <small class="text-muted">Keep up the great work!</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="dashboard-card">
+                    <h4><i class="fas fa-trophy"></i> Achievements</h4>
+                    <div th:if="${achievements != null and !achievements.empty}">
+                        <div th:each="achievement : ${achievements}">
+                            <span class="achievement-badge">
+                                <i class="fas fa-medal"></i>
+                                <span th:text="${achievement.name}">Achievement Name</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${achievements == null or achievements.empty}" class="empty-state">
+                        <i class="fas fa-trophy"></i>
+                        <p>Earn achievements by taking quizzes!</p>
+                        <small class="text-muted">Complete your first quiz to get started</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script layout:fragment="scripts">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate progress numbers
+            const progressNumbers = document.querySelectorAll('.progress-number');
+            progressNumbers.forEach(num => {
+                const value = parseInt(num.textContent) || 0;
+                let current = 0;
+                const increment = Math.ceil(value / 20);
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= value) {
+                        current = value;
+                        clearInterval(timer);
+                    }
+                    num.textContent = current + (num.textContent.includes('%') ? '%' : 
+                                                  num.textContent.includes('h') ? 'h' : '');
+                }, 50);
+            });
+
+            // Animate progress bars
+            setTimeout(() => {
+                const progressBars = document.querySelectorAll('.progress-fill');
+                progressBars.forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

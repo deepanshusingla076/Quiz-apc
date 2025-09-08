@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">QWIZZ - Interactive Quiz Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/" class="nav-brand">
+                    <i class="fas fa-brain"></i>
+                    QWIZZ
+                </a>
+            </div>
+            
+            <div class="nav-menu" id="nav-menu">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/quiz/browse" class="nav-link">Browse Quizzes</a>
+                
+                <div th:if="${session.isLoggedIn}">
+                    <a href="/dashboard" class="nav-link">Dashboard</a>
+                    <a href="/quiz/create" class="nav-link">Create Quiz</a>
+                    <a href="/quiz/ai-generate" class="nav-link">AI Generator</a>
+                    <div class="nav-dropdown">
+                        <a href="#" class="nav-link dropdown-trigger">
+                            <i class="fas fa-user"></i>
+                            <span th:text="${session.firstName}">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="/user/profile" class="dropdown-item">Profile</a>
+                            <a href="/user/attempts" class="dropdown-item">My Attempts</a>
+                            <a href="/user/quizzes" class="dropdown-item">My Quizzes</a>
+                            <hr class="dropdown-divider">
+                            <a href="/auth/logout" class="dropdown-item">Logout</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div th:unless="${session.isLoggedIn}">
+                    <a href="/auth/login" class="nav-link">Login</a>
+                    <a href="/auth/register" class="nav-link btn-primary">Register</a>
+                </div>
+            </div>
+            
+            <div class="nav-toggle" id="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div th:if="${successMessage}" class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${successMessage}"></span>
+        <button class="alert-close">&times;</button>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Welcome to <span class="accent">QWIZZ</span>
+                </h1>
+                <p class="hero-subtitle">
+                    The most <strong>interactive</strong> and <strong>AI-powered</strong> quiz platform 
+                    where learning meets fun! Create, share, and challenge yourself with unlimited quizzes.
+                </p>
+                
+                <div class="hero-cta">
+                    <div th:if="${session.isLoggedIn}">
+                        <a href="/dashboard" class="btn btn-primary btn-large">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Go to Dashboard
+                        </a>
+                        <a href="/quiz/browse" class="btn btn-secondary btn-large">
+                            <i class="fas fa-search"></i>
+                            Browse Quizzes
+                        </a>
+                    </div>
+                    <div th:unless="${session.isLoggedIn}">
+                        <a href="/auth/register" class="btn btn-primary btn-large">
+                            <i class="fas fa-rocket"></i>
+                            Get Started Free
+                        </a>
+                        <a href="/quiz/browse" class="btn btn-secondary btn-large">
+                            <i class="fas fa-eye"></i>
+                            Explore Quizzes
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="floating-card card-1">
+                    <i class="fas fa-brain"></i>
+                    <span>AI Powered</span>
+                </div>
+                <div class="floating-card card-2">
+                    <i class="fas fa-users"></i>
+                    <span>Community</span>
+                </div>
+                <div class="floating-card card-3">
+                    <i class="fas fa-trophy"></i>
+                    <span>Compete</span>
+                </div>
+                <div class="floating-card card-4">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Track Progress</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose QWIZZ?</h2>
+            <p class="section-subtitle">Discover what makes our platform special</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI Quiz Generation</h3>
+                    <p>Let our AI create personalized quizzes based on your topics and difficulty preferences. Smart, adaptive, and always challenging!</p>
+                    <a href="/quiz/ai-generate" class="feature-link">Try AI Generator <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>Create Custom Quizzes</h3>
+                    <p>Build your own quizzes with multiple question types, custom scoring, and beautiful formatting. Share with the world!</p>
+                    <a href="/quiz/create" class="feature-link">Create Quiz <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3>Join Public Quizzes</h3>
+                    <p>Explore thousands of quizzes created by our community. From science to pop culture, there's something for everyone!</p>
+                    <a href="/quiz/browse" class="feature-link">Browse Quizzes <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h3>Personal Dashboard</h3>
+                    <p>Track your progress, view your quiz history, manage your creations, and see your achievements all in one place.</p>
+                    <a href="/user/dashboard" class="feature-link">View Dashboard <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Performance Analytics</h3>
+                    <p>Get detailed insights into your quiz performance, identify areas for improvement, and track your learning journey.</p>
+                    <a href="/user/attempts" class="feature-link">View Stats <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Take quizzes anywhere, anytime! Our responsive design works perfectly on all devices and screen sizes.</p>
+                    <a href="#" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Quizzes Created</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">5000+</div>
+                    <div class="stat-label">Users Registered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">50000+</div>
+                    <div class="stat-label">Quiz Attempts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">User Satisfaction</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Start Your Quiz Journey?</h2>
+                <p>Join thousands of learners and creators on QWIZZ today!</p>
+                
+                <div class="cta-buttons">
+                    <div th:if="${session.isLoggedIn}">
+                        <a href="/quiz/create" class="btn btn-primary btn-large">
+                            <i class="fas fa-plus"></i>
+                            Create Your First Quiz
+                        </a>
+                        <a href="/quiz/ai-generate" class="btn btn-accent btn-large">
+                            <i class="fas fa-magic"></i>
+                            Try AI Generator
+                        </a>
+                    </div>
+                    <div th:unless="${session.isLoggedIn}">
+                        <a href="/auth/register" class="btn btn-primary btn-large">
+                            <i class="fas fa-user-plus"></i>
+                            Sign Up Now
+                        </a>
+                        <a href="/auth/login" class="btn btn-secondary btn-large">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>QWIZZ</h3>
+                <p>Interactive quiz platform with AI-powered quiz generation</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/quiz/browse">Browse Quizzes</a></li>
+                    <li><a href="/features">Features</a></li>
+                    <li><a href="/about">About</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="/help">Help Center</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                    <li><a href="/terms">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 QWIZZ. All rights reserved. Made with <i class="fas fa-heart"></i></p>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
