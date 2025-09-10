@@ -1,419 +1,105 @@
 <!DOCTYPE html>
-<html lang="en" layout:decorate="~{layout}">
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - QWIZZ</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
             --primary: #FF6B35;
-            --brutal-pink: #FF3366;
-            --secondary: #00D2FF;
-            --accent: #FFE66D;
-            --dark: #1A1B23;
-            --light: #F8F9FA;
+            --pink: #FF3366;
+            --cyan: #00D2FF;
             --white: #FFFFFF;
             --black: #000000;
-            --font-primary: 'Arial Black', Arial, sans-serif;
-            --font-secondary: 'Arial', sans-serif;
-            --border-thick: 4px solid var(--black);
-            --shadow-brutal: 8px 8px 0px var(--black);
-            --shadow-small: 4px 4px 0px var(--black);
+            --light: #F8F9FA;
+            --font-bold: 'Arial Black', Arial, sans-serif;
+            --font: Arial, sans-serif;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: var(--font-secondary);
-            background: linear-gradient(135deg, var(--primary), var(--brutal-pink), var(--secondary));
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--pink), var(--cyan));
             background-size: 400% 400%;
-            animation: gradientMove 10s ease infinite;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            animation: bg 10s ease-in-out infinite alternate;
+            font-family: var(--font);
         }
-
-        /* Animated background */
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Top nav brutalist style */
-        .nav-bar {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 10;
-        }
-
-        .back-to-home {
-            background: var(--white);
-            color: var(--black);
-            padding: 0.8rem 1.5rem;
-            border: var(--border-thick);
-            font-family: var(--font-primary);
-            font-weight: 900;
-            text-transform: uppercase;
-            font-size: 1rem;
-            box-shadow: var(--shadow-small);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .back-to-home:hover {
-            background: var(--accent);
-            transform: translate(-3px, -3px) rotate(-2deg);
-            box-shadow: var(--shadow-brutal);
-        }
-
-        .auth-wrapper {
-            position: relative;
+        @keyframes bg { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+        .box {
             width: 100%;
-            max-width: 600px;
-        }
-
-        .sliding-container {
+            max-width: 420px;
             background: var(--white);
-            border: var(--border-thick);
-            box-shadow: var(--shadow-brutal);
-            border-radius: 12px;
-            overflow: hidden;
-            min-height: 600px;
+            border: 4px solid var(--black);
+            box-shadow: 8px 8px 0 var(--black);
+            border-radius: 10px;
+            padding: 28px;
+            text-align: left;
+        }
+        h1 {
+            font-family: var(--font-bold);
+            font-size: 24px;
+            margin-bottom: 18px;
+        }
+        label { display: block; font-family: var(--font-bold); font-size: 12px; text-transform: uppercase; margin-bottom: 6px; }
+        input[type="text"], input[type="password"] {
             width: 100%;
-            padding: 2rem;
-        }
-
-        .slide {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            height: 100%;
-        }
-
-        .slide.active {
-            display: flex;
-        }
-
-        .slide-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .slide-header h1 {
-            font-family: var(--font-primary);
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--black);
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 3px 3px 0px var(--primary);
-        }
-
-        .slide-header p {
-            font-family: var(--font-primary);
-            font-size: 1rem;
-            color: var(--dark);
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .form-group label {
-            font-weight: 900;
-            font-family: var(--font-primary);
-            text-transform: uppercase;
-            font-size: 0.95rem;
-            color: var(--dark);
-        }
-
-        .form-group input {
-            border: 2px solid var(--black);
-            padding: 15px 18px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            border: 3px solid var(--black);
             background: var(--light);
-            transition: all 0.3s ease;
+            padding: 12px 14px;
+            font-size: 14px;
+            margin-bottom: 14px;
         }
-
-        .form-group input:focus {
-            border: var(--border-thick);
-            outline: none;
-            transform: translate(-2px, -2px);
-            box-shadow: var(--shadow-small);
-            background: var(--white);
-        }
-
-        .role-selection {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .role-option {
-            padding: 1rem;
-            border: 2px solid var(--black);
-            background: var(--light);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: var(--font-primary);
-        }
-
-        .role-option:hover,
-        .role-option.selected {
-            border: var(--border-thick);
-            background: var(--white);
-            transform: translate(-3px, -3px);
-            box-shadow: var(--shadow-small);
-        }
-
-        .btn-primary {
-            padding: 1rem 1.5rem;
-            font-family: var(--font-primary);
-            font-weight: 900;
-            text-transform: uppercase;
-            border: var(--border-thick);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            box-shadow: var(--shadow-small);
-            font-size: 1rem;
+        .roles { display: flex; gap: 14px; align-items: center; margin: 6px 0 10px; }
+        .roles label{display:flex;align-items:center;gap:8px;border:3px solid var(--black);padding:8px 12px;background:var(--light);cursor:pointer;box-shadow:4px 4px 0 var(--black)}
+        .roles input{accent-color:#000}
+        .btn {
+            display: inline-block;
+            width: 100%;
             background: var(--primary);
             color: var(--white);
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background: var(--brutal-pink);
-            transform: translate(-3px, -3px);
-            box-shadow: var(--shadow-brutal);
-        }
-
-        .slide-footer {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 2px solid var(--light);
-        }
-
-        .slide-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 900;
+            border: 4px solid var(--black);
+            font-family: var(--font-bold);
             text-transform: uppercase;
-            font-size: 0.9rem;
-            font-family: var(--font-primary);
+            padding: 12px 16px;
+            text-align: center;
             cursor: pointer;
+            box-shadow: 6px 6px 0 var(--black);
         }
-
-        .slide-footer a:hover {
-            color: var(--brutal-pink);
-            text-decoration: underline;
-        }
+        .btn.secondary { background: var(--white); color: var(--black); margin-top: 10px; }
+        .link { margin-top: 14px; text-align: center; font-family: var(--font-bold); }
+        .link a { color: var(--primary); text-decoration: none; }
     </style>
+    <script>
+        function afterSubmit(e){
+            // Let server handle; this function kept for future client checks
+        }
+    </script>
+    <style> footer, nav { display: none !important; } </style>
 </head>
 <body>
-<div class="nav-bar">
-    <a href="/" class="back-to-home">
-        <i class="fas fa-home"></i>
-        <span>Home</span>
-    </a>
-</div>
+    <div class="box">
+        <h1><i class="fas fa-right-to-bracket"></i> Login</h1>
+        <form action="/login" method="post" onsubmit="afterSubmit(event)">
+            <label for="username">Username or Email</label>
+            <input id="username" name="username" type="text" required>
 
-<div class="auth-wrapper">
-    <div class="sliding-container">
-        <!-- Login Slide -->
-        <div class="slide login-slide active">
-            <div class="slide-header">
-                <h1><i class="fas fa-sign-in-alt"></i> LOGIN</h1>
-                <p>Welcome Back to QWIZZ!</p>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" required minlength="6">
+
+            <label>Role</label>
+            <div class="roles">
+                <label><input type="radio" name="role" value="STUDENT" checked> Student</label>
+                <label><input type="radio" name="role" value="TEACHER"> Teacher</label>
             </div>
 
-            <form action="/login" method="post" class="auth-form">
-                <div class="form-group">
-                    <label>Choose Your Role</label>
-                    <div class="role-selection">
-                        <div class="role-option selected" onclick="selectRole('STUDENT')" id="studentRole">
-                            <i class="fas fa-graduation-cap"></i>
-                            <span>Student</span>
-                        </div>
-                        <div class="role-option" onclick="selectRole('TEACHER')" id="teacherRole">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <span>Teacher</span>
-                        </div>
-                    </div>
-                    <input type="hidden" id="selectedRole" name="role" value="STUDENT">
-                </div>
-
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-
-                <button type="submit" class="btn-primary">
-                    <i class="fas fa-rocket"></i>
-                    Login to QWIZZ
-                </button>
-            </form>
-
-            <div class="slide-footer">
-                <p>Don't have an account?
-                    <a onclick="showRegisterSlide()">Create Account</a>
-                </p>
-            </div>
-        </div>
-
-        <!-- Register Slide -->
-        <div class="slide register-slide">
-            <div class="slide-header">
-                <h1><i class="fas fa-user-plus"></i> REGISTER</h1>
-                <p>Join the QWIZZ Community!</p>
-            </div>
-
-            <form action="/register" method="post" class="auth-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="firstName">First Name</label>
-                        <input type="text" id="firstName" name="firstName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastName">Last Name</label>
-                        <input type="text" id="lastName" name="lastName" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="regUsername">Username</label>
-                    <input type="text" id="regUsername" name="username" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="regPassword">Password</label>
-                        <input type="password" id="regPassword" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Choose Your Role</label>
-                    <div class="role-selection">
-                        <div class="role-option selected" onclick="selectRegRole('STUDENT')" id="regStudentRole">
-                            <i class="fas fa-graduation-cap"></i>
-                            <span>Student</span>
-                        </div>
-                        <div class="role-option" onclick="selectRegRole('TEACHER')" id="regTeacherRole">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <span>Teacher</span>
-                        </div>
-                    </div>
-                    <input type="hidden" id="selectedRegRole" name="role" value="STUDENT">
-                </div>
-
-                <button type="submit" class="btn-primary">
-                    <i class="fas fa-rocket"></i>
-                    Create Account
-                </button>
-            </form>
-
-            <div class="slide-footer">
-                <p>Already have an account?
-                    <a onclick="showLoginSlide()">Sign In</a>
-                </p>
-            </div>
-        </div>
+            <button type="submit" class="btn">Login</button>
+            <a href="/" class="btn secondary">Back to Home</a>
+        </form>
+        <div class="link">Don’t have an account? <a href="/register">Create Account</a></div>
     </div>
-</div>
-
-<script>
-    function selectRole(role) {
-        document.querySelectorAll('#studentRole, #teacherRole').forEach(option => {
-            option.classList.remove('selected');
-        });
-        if (role === 'STUDENT') {
-            document.getElementById('studentRole').classList.add('selected');
-        } else {
-            document.getElementById('teacherRole').classList.add('selected');
-        }
-        document.getElementById('selectedRole').value = role;
-    }
-
-    function selectRegRole(role) {
-        document.querySelectorAll('#regStudentRole, #regTeacherRole').forEach(option => {
-            option.classList.remove('selected');
-        });
-        if (role === 'STUDENT') {
-            document.getElementById('regStudentRole').classList.add('selected');
-        } else {
-            document.getElementById('regTeacherRole').classList.add('selected');
-        }
-        document.getElementById('selectedRegRole').value = role;
-    }
-
-    function showRegisterSlide() {
-        document.querySelector('.login-slide').classList.remove('active');
-        document.querySelector('.register-slide').classList.add('active');
-    }
-
-    function showLoginSlide() {
-        document.querySelector('.register-slide').classList.remove('active');
-        document.querySelector('.login-slide').classList.add('active');
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        selectRole('STUDENT');
-        selectRegRole('STUDENT');
-        if (window.location.hash === '#register') {
-            showRegisterSlide();
-        }
-    });
-</script>
 </body>
 </html>
+

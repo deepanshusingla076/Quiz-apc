@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>Error - QWIZZ</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container py-5">
+        <div class="text-center">
+            <h1 class="display-6 fw-bold">An error occurred</h1>
+            <p class="lead" th:text="${message} ?: 'Please try again later.'">Please try again later.</p>
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home me-2"></i>Go Home
+            </a>
+        </div>
+    </div>
+    <script layout:fragment="scripts"></script>
+    <style>
+        .btn { border: 2px solid #000; box-shadow: 4px 4px 0 #000; }
+        .btn:hover { transform: translate(-2px, -2px); }
+    </style>
+    </div>
+</body>
+</html>
+
+

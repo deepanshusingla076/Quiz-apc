@@ -54,17 +54,20 @@ public class SecurityConfig {
                 // Public endpoints
                 .requestMatchers("/", "/home", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/jwt/**").permitAll()
                 .requestMatchers("/api/check-username", "/api/check-email").permitAll()
                 .requestMatchers("/forgot-password").permitAll()
+                
+                // Dashboard endpoints (authenticated users)
+                .requestMatchers("/dashboard").authenticated()
+                .requestMatchers("/quiz/**").authenticated()
+                .requestMatchers("/api/quiz/**").authenticated()
                 
                 // Teacher endpoints
                 .requestMatchers("/teacher/**").hasRole("TEACHER")
                 
                 // Student endpoints  
                 .requestMatchers("/student/**").hasRole("STUDENT")
-                
-                // Admin endpoints
-                .requestMatchers("/admin/**").hasRole("ADMIN")
                 
                 // All other requests require authentication
                 .anyRequest().authenticated()
@@ -82,8 +85,8 @@ public class SecurityConfig {
                     response.sendRedirect("/login");
                 })
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
-                    // Redirect to login page for access denied
-                    response.sendRedirect("/login");
+                    // Redirect to 403 page for access denied
+                    response.sendRedirect("/error/403");
                 })
             )
             .authenticationProvider(authenticationProvider())

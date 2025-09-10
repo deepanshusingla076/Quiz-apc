@@ -1,13 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - QWIZZ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary:#FF6B35; --pink:#FF3366; --cyan:#00D2FF; --white:#FFF; --black:#000; --light:#F8F9FA; --font-bold:'Arial Black',Arial,sans-serif; --font:Arial,sans-serif; }
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary),var(--pink),var(--cyan));background-size:400% 400%;animation:bg 10s ease-in-out infinite alternate;font-family:var(--font)}
+        @keyframes bg{from{background-position:0% 50%}to{background-position:100% 50%}}
+        .box{width:100%;max-width:520px;background:var(--white);border:4px solid var(--black);box-shadow:8px 8px 0 var(--black);border-radius:10px;padding:28px}
+        h1{font-family:var(--font-bold);font-size:24px;margin-bottom:18px}
+        label{display:block;font-family:var(--font-bold);font-size:12px;text-transform:uppercase;margin-bottom:6px}
+        input[type=text],input[type=password],input[type=email]{width:100%;border:3px solid var(--black);background:var(--light);padding:12px 14px;font-size:14px;margin-bottom:14px}
+        .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .roles{display:flex;gap:14px;align-items:center;margin:6px 0 10px}
+        .roles label{display:flex;align-items:center;gap:8px;border:3px solid var(--black);padding:8px 12px;background:var(--light);cursor:pointer;box-shadow:4px 4px 0 var(--black)}
+        .roles input{accent-color:#000}
+        .btn{display:inline-block;width:100%;background:var(--primary);color:var(--white);border:4px solid var(--black);font-family:var(--font-bold);text-transform:uppercase;padding:12px 16px;text-align:center;cursor:pointer;box-shadow:6px 6px 0 var(--black)}
+        .btn.secondary{background:var(--white);color:var(--black);margin-top:10px}
+        .link{text-align:center;margin-top:14px;font-family:var(--font-bold)}
+        .link a{color:var(--primary);text-decoration:none}
+        footer,nav{display:none!important}
+        small.help{display:block;color:#555;margin-top:-8px;margin-bottom:8px}
+        small.error{display:none;color:#FF3366;margin-top:-8px;margin-bottom:8px}
+    </style>
     <script>
-        // Redirect to login page with register mode
-        window.location.href = '/login#register';
+        function onPwInput(){
+            var p=document.getElementById('password');
+            var c=document.getElementById('confirmPassword');
+            var m=document.getElementById('matchMsg');
+            if(!p.value||!c.value){m.style.display='none';return;}
+            m.style.display = (p.value===c.value)?'none':'block';
+        }
     </script>
 </head>
 <body>
-    <p>Redirecting to registration...</p>
+    <div class="box">
+        <h1><i class="fas fa-user-plus"></i> Create Account</h1>
+        
+        <!-- Error Messages -->
+        <div th:if="${errorMessage}" style="background:#FF3366;color:white;padding:12px;margin-bottom:16px;border:3px solid #000;box-shadow:4px 4px 0 #000;">
+            <i class="fas fa-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+        </div>
+        
+        <!-- Success Messages -->
+        <div th:if="${successMessage}" style="background:#28a745;color:white;padding:12px;margin-bottom:16px;border:3px solid #000;box-shadow:4px 4px 0 #000;">
+            <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+        </div>
+        
+        <form action="/register" method="post">
+            <div class="row">
+                <div>
+                    <label for="firstName">First Name</label>
+                    <input id="firstName" name="firstName" type="text" required>
+                </div>
+                <div>
+                    <label for="lastName">Last Name</label>
+                    <input id="lastName" name="lastName" type="text" required>
+                </div>
+            </div>
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" required>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" required>
+            <div class="row">
+                <div>
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" minlength="6" required oninput="onPwInput()">
+                    <small class="help">Minimum 6 characters</small>
+                </div>
+                <div>
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input id="confirmPassword" name="confirmPassword" type="password" required oninput="onPwInput()">
+                    <small id="matchMsg" class="error">Passwords do not match</small>
+                </div>
+            </div>
+            <label>Role</label>
+            <div class="roles">
+                <label><input type="radio" name="role" value="STUDENT" checked> Student</label>
+                <label><input type="radio" name="role" value="TEACHER"> Teacher</label>
+            </div>
+            <button type="submit" class="btn">Create Account</button>
+            <a href="/" class="btn secondary">Back to Home</a>
+        </form>
+        <div class="link">Already have an account? <a href="/login">Login</a></div>
+    </div>
 </body>
 </html>

@@ -15,6 +15,7 @@ com\qwizz\model\AttemptStatus.class
 com\qwizz\config\DatabaseInitializer$QuestionData.class
 com\qwizz\controller\HomeController.class
 com\qwizz\repository\UserAchievementRepository.class
+com\qwizz\controller\JwtSecretController.class
 com\qwizz\model\User.class
 com\qwizz\service\CategoryService.class
 com\qwizz\model\Achievement.class
@@ -23,7 +24,6 @@ com\qwizz\service\QuestionBankService.class
 com\qwizz\repository\QuizAttemptRepository.class
 com\qwizz\repository\AchievementRepository.class
 com\qwizz\repository\LeaderboardRepository.class
-com\qwizz\controller\AuthController$1.class
 com\qwizz\model\QuestionType.class
 com\qwizz\service\QuizService.class
 com\qwizz\service\QuizAttemptService.class

@@ -45,7 +45,8 @@ public class AuthController {
                        @RequestParam(required = false) String role,
                        HttpServletResponse response,
                        RedirectAttributes redirectAttributes,
-                       Model model) {
+                       Model model,
+                       jakarta.servlet.http.HttpSession session) {
         try {
             // Authenticate user
             Authentication authentication = authenticationManager.authenticate(
@@ -76,16 +77,17 @@ public class AuthController {
             jwtCookie.setHttpOnly(true);
             jwtCookie.setPath("/");
             jwtCookie.setMaxAge(24 * 60 * 60); // 24 hours
+            jwtCookie.setSecure(false);
             response.addCookie(jwtCookie);
+
+            // Also set session for controllers that read from session
+            session.setAttribute("user", user);
 
             redirectAttributes.addFlashAttribute("successMessage",
                 "Welcome back, " + user.getFirstName() + "!");
 
-            // Redirect based on role
-            return switch (user.getRole()) {
-                case TEACHER -> "redirect:/dashboard?role=teacher";
-                case STUDENT -> "redirect:/dashboard?role=student";
-            };
+            // Redirect to dashboard (controller will route by role)
+            return "redirect:/dashboard";
 
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Invalid username or password");
@@ -114,8 +116,12 @@ public class AuthController {
     public String register(@ModelAttribute User user,
                           @RequestParam String confirmPassword,
                           @RequestParam String role,
-                          RedirectAttributes redirectAttributes) {
+                          RedirectAttributes redirectAttributes,
+                          HttpServletResponse response,
+                          jakarta.servlet.http.HttpSession session) {
         try {
+            // Preserve raw password for authentication before it gets encoded by the service
+            String rawPassword = user.getPassword();
             // Validate passwords match
             if (!user.getPassword().equals(confirmPassword)) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Passwords do not match");
@@ -146,10 +152,31 @@ public class AuthController {
             }
 
             User savedUser = userService.registerUser(user);
-            redirectAttributes.addFlashAttribute("successMessage",
-                "Registration successful! Welcome to QWIZZ, " + savedUser.getFirstName() + "!");
 
-            return "redirect:/login";
+            // Auto-login after successful registration and set JWT cookie
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(savedUser.getUsername(), rawPassword)
+            );
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User authedUser = (User) userDetails;
+
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("role", authedUser.getRole().toString());
+            claims.put("userId", authedUser.getId());
+            String token = jwtUtil.generateToken(userDetails, claims);
+
+            Cookie jwtCookie = new Cookie("jwt-token", token);
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge(24 * 60 * 60);
+            jwtCookie.setSecure(false);
+            response.addCookie(jwtCookie);
+
+            session.setAttribute("user", authedUser);
+
+            // Redirect to dashboard (controller will route by role)
+            return "redirect:/dashboard";
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Registration failed: " + e.getMessage());

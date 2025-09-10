@@ -1,10 +1,6 @@
-# QWIZZ - Interactive Quiz Platform
+# QWIZZ – Interactive Quiz Platform
 
-![QWIZZ Banner](https://via.placeholder.com/800x200/FF6B35/FFFFFF?text=QWIZZ+-+Interactive+Quiz+Platform)
-
-## 🎯 Overview
-
-QWIZZ is a modern, interactive quiz platform built with Spring Boot and featuring a unique **New Brutalist** design aesthetic. The platform combines powerful backend functionality with an eye-catching, funky frontend that makes learning and quiz-taking a delightful experience.
+Modern Spring Boot + Thymeleaf quiz application with role-based dashboards (Student/Teacher), JWT authentication, and a bold “New Brutalist” UI. Built for learning, authoring, and taking quizzes end-to-end.
 
 ## ✨ Features
 
@@ -25,11 +21,11 @@ QWIZZ is a modern, interactive quiz platform built with Spring Boot and featurin
 - **Modern Typography** - Bold fonts and creative layouts
 
 ### 🛠 Technical Features
-- **Spring Boot 3.2** - Latest Spring Boot framework
-- **MySQL Database** - Robust data persistence with JDBC
-- **Thymeleaf Templates** - Server-side rendering
-- **RESTful Architecture** - Clean API design
-- **Responsive CSS** - Mobile-first design approach
+- **Spring Boot 3.2** (Java 17)
+- **MySQL** via Spring Data JPA
+- **Thymeleaf + Layout & Security Dialects**
+- **Spring Security (JWT)** with stateless sessions
+- **Responsive CSS** (custom brutalist theme)
 
 ## 🚀 Getting Started
 
@@ -42,7 +38,7 @@ Before running QWIZZ, make sure you have:
 - **MySQL 8.0+** running locally
 - **Git** for cloning the repository
 
-### Installation Steps
+### Installation
 
 1. **Clone the Repository**
    ```bash
@@ -50,7 +46,7 @@ Before running QWIZZ, make sure you have:
    cd qwizz
    ```
 
-2. **Setup MySQL Database**
+2. **Setup MySQL Database** (optional; DB auto-creates on first run)
    ```sql
    -- Create database (optional - app will create it automatically)
    CREATE DATABASE qwizz_db;
@@ -116,7 +112,7 @@ qwizz/
 
 1. **Register/Login**
    - Create an account or login with existing credentials
-   - Default test users: `admin/password123`, `john_doe/password123`
+   - Example seeded users are available if you load `schema.sql` manually.
 
 2. **Take Quizzes**
    - Browse public quizzes on the Browse page
@@ -128,10 +124,7 @@ qwizz/
    - Add multiple question types (Multiple Choice, True/False, Short Answer)
    - Set difficulty levels and time limits
 
-4. **AI Quiz Generation**
-   - Try the AI Generator for automatic quiz creation
-   - Specify topic, difficulty, and number of questions
-   - Review and edit generated content
+4. (Optional) AI Generation – UI hooks present; wire your provider to enable.
 
 5. **Track Progress**
    - View your dashboard for statistics
@@ -156,7 +149,7 @@ The application uses four main tables:
 - `questions` - Individual quiz questions
 - `quiz_attempts` - User quiz attempt records
 
-## 🎨 Design System
+## 🎨 Design System (Brief)
 
 ### Color Palette
 - **Primary**: `#FF6B35` (Orange)
@@ -198,7 +191,7 @@ We welcome contributions! Here's how to get started:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## 🧪 Build, Run, and Troubleshooting
 
 ### Common Issues
 
@@ -214,6 +207,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Build Failures**
 - Ensure Java 17+ is installed
 - Run `mvn clean install` to refresh dependencies
+
+**JWT Secret (Production)**
+- Set an environment variable and let Spring read it:
+  - Windows PowerShell: `$env:JWT_SECRET = (openssl rand -base64 48)`
+  - Or generate any strong base64/hex string and assign to `JWT_SECRET`.
+- The app reads it via `jwt.secret=${JWT_SECRET:...}` in `application.properties`.
 
 ### Getting Help
 
