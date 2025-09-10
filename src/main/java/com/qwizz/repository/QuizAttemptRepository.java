@@ -39,7 +39,7 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> 
     
     // Find best attempt for user and quiz
     @Query("SELECT qa FROM QuizAttempt qa WHERE qa.user.id = :userId AND qa.quiz.id = :quizId " +
-           "AND qa.completed = true ORDER BY qa.score DESC, qa.percentageScore DESC")
+           "AND qa.completed = true ORDER BY qa.score DESC, qa.percentage DESC")
     Optional<QuizAttempt> findBestAttemptByUserAndQuiz(@Param("userId") Long userId, @Param("quizId") Long quizId);
     
     // Find user's average score
@@ -55,12 +55,12 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> 
     List<QuizAttempt> findByStartTimeBetweenOrderByStartTimeDesc(LocalDateTime start, LocalDateTime end);
     
     // Find high score attempts
-    @Query("SELECT qa FROM QuizAttempt qa WHERE qa.percentageScore >= :minPercentage AND qa.completed = true " +
-           "ORDER BY qa.percentageScore DESC, qa.score DESC")
+    @Query("SELECT qa FROM QuizAttempt qa WHERE qa.percentage >= :minPercentage AND qa.completed = true " +
+           "ORDER BY qa.percentage DESC, qa.score DESC")
     List<QuizAttempt> findHighScoreAttempts(@Param("minPercentage") Double minPercentage);
     
     // Find quiz performance statistics
-    @Query("SELECT AVG(qa.score), AVG(qa.percentageScore), COUNT(qa) FROM QuizAttempt qa " +
+    @Query("SELECT AVG(qa.score), AVG(qa.percentage), COUNT(qa) FROM QuizAttempt qa " +
            "WHERE qa.quiz.id = :quizId AND qa.completed = true")
     Object[] getQuizStatistics(@Param("quizId") Long quizId);
     

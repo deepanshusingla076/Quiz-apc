@@ -60,11 +60,23 @@ public class QuizAttempt {
     @Column(name = "time_taken")
     private Integer timeTaken; // in seconds
     
-    @Column(name = "percentage_score", columnDefinition = "DECIMAL(5,2)")
-    private Double percentageScore;
+    @Column(name = "percentage", columnDefinition = "DECIMAL(5,2)")
+    private Double percentage;
     
-    @Column(name = "max_possible_score")
-    private Integer maxPossibleScore;
+    @Column(name = "attempt_number")
+    private Integer attemptNumber = 1;
+    
+    @Column(name = "wrong_answers")
+    private Integer wrongAnswers = 0;
+    
+    @Column(name = "skipped_answers")
+    private Integer skippedAnswers = 0;
+    
+    @Column(name = "total_points", columnDefinition = "DECIMAL(5,2)")
+    private Double totalPoints = 0.0;
+    
+    @Column(name = "passed")
+    private Boolean passed = false;
     
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
@@ -208,20 +220,52 @@ public class QuizAttempt {
         this.timeTaken = timeTaken;
     }
     
-    public Double getPercentageScore() {
-        return percentageScore;
+    public Double getPercentage() {
+        return percentage;
     }
     
-    public void setPercentageScore(Double percentageScore) {
-        this.percentageScore = percentageScore;
+    public void setPercentage(Double percentage) {
+        this.percentage = percentage;
     }
     
-    public Integer getMaxPossibleScore() {
-        return maxPossibleScore;
+    public Integer getAttemptNumber() {
+        return attemptNumber;
     }
     
-    public void setMaxPossibleScore(Integer maxPossibleScore) {
-        this.maxPossibleScore = maxPossibleScore;
+    public void setAttemptNumber(Integer attemptNumber) {
+        this.attemptNumber = attemptNumber;
+    }
+    
+    public Integer getWrongAnswers() {
+        return wrongAnswers;
+    }
+    
+    public void setWrongAnswers(Integer wrongAnswers) {
+        this.wrongAnswers = wrongAnswers;
+    }
+    
+    public Integer getSkippedAnswers() {
+        return skippedAnswers;
+    }
+    
+    public void setSkippedAnswers(Integer skippedAnswers) {
+        this.skippedAnswers = skippedAnswers;
+    }
+    
+    public Double getTotalPoints() {
+        return totalPoints;
+    }
+    
+    public void setTotalPoints(Double totalPoints) {
+        this.totalPoints = totalPoints;
+    }
+    
+    public Boolean getPassed() {
+        return passed;
+    }
+    
+    public void setPassed(Boolean passed) {
+        this.passed = passed;
     }
     
     public String getIpAddress() {
@@ -248,14 +292,15 @@ public class QuizAttempt {
         this.answers = answers;
     }
 
-    public double getPercentage() {
+    public double getCalculatedPercentage() {
         if (totalQuestions == 0)
             return 0.0;
         return (double) correctAnswers / totalQuestions * 100;
     }
 
     public String getFormattedPercentage() {
-        return String.format("%.1f%%", getPercentage());
+        Double pct = percentage != null ? percentage : getCalculatedPercentage();
+        return String.format("%.1f%%", pct);
     }
 
     public Duration getDuration() {
@@ -276,7 +321,8 @@ public class QuizAttempt {
     }
 
     public boolean isPassed() {
-        return getPercentage() >= 50.0; // 50% passing grade
+        Double pct = percentage != null ? percentage : getCalculatedPercentage();
+        return pct >= 50.0; // 50% passing grade
     }
 
     @Override

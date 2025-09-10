@@ -1,6 +1,5 @@
-/* QWIZZ - New Brutalist Design System */
+/* QWIZZ - Brutalist Design System */
 
-/* CSS Reset and Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -8,7 +7,6 @@
 }
 
 :root {
-    /* Colors - Vibrant and Bold */
     --primary: #FF6B35;
     --secondary: #00D2FF;
     --accent: #FFE66D;
@@ -21,19 +19,16 @@
     --white: #FFFFFF;
     --black: #000000;
     
-    /* Brutal Colors */
     --brutal-pink: #FF3366;
     --brutal-cyan: #00FFCC;
     --brutal-purple: #6633FF;
     --brutal-yellow: #FFCC00;
     --brutal-green: #33FF66;
     
-    /* Typography */
     --font-primary: 'Arial Black', Arial, sans-serif;
     --font-secondary: 'Arial', sans-serif;
     --font-mono: 'Courier New', monospace;
     
-    /* Spacing */
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
     --space-md: 1rem;
@@ -41,12 +36,10 @@
     --space-xl: 2rem;
     --space-xxl: 3rem;
     
-    /* Borders */
     --border-thick: 4px solid var(--black);
     --border-medium: 3px solid var(--black);
     --border-thin: 2px solid var(--black);
     
-    /* Shadows - Brutal and Bold */
     --shadow-brutal: 8px 8px 0px var(--black);
     --shadow-brutal-hover: 12px 12px 0px var(--black);
     --shadow-card: 6px 6px 0px var(--black);
@@ -60,8 +53,6 @@ body {
     line-height: 1.6;
     overflow-x: hidden;
 }
-
-/* Typography */
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-primary);
     font-weight: 900;
@@ -96,14 +87,11 @@ p {
     transform: skew(-12deg);
 }
 
-/* Container and Layout */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--space-lg);
 }
-
-/* Navigation */
 .navbar {
     background: var(--white);
     border-bottom: var(--border-thick);

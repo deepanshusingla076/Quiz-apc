@@ -267,9 +267,9 @@ public class DatabaseInitializer {
                         
                         attempt.setCorrectAnswers(correctAnswers);
                         attempt.setScore(score);
-                        attempt.setPercentageScore((double) correctAnswers / totalQuestions * 100);
+                        attempt.setPercentage((double) correctAnswers / totalQuestions * 100);
                         attempt.setTimeTaken(random.nextInt(1800) + 300); // 5-35 minutes
-                        attempt.setMaxPossibleScore(totalQuestions * 10);
+                        attempt.setTotalPoints((double) totalQuestions * 10);
                         
                         // Set random completion time in the past
                         LocalDateTime startTime = LocalDateTime.now().minusDays(random.nextInt(30));
@@ -280,7 +280,7 @@ public class DatabaseInitializer {
                         quizAttemptService.submitQuizAttempt(attempt.getId(), correctAnswers, score);
                         
                         // Update quiz statistics
-                        quizService.updateQuizStatistics(randomQuiz, attempt.getPercentageScore());
+                        quizService.updateQuizStatistics(randomQuiz, attempt.getPercentage());
                     } catch (Exception e) {
                         // Skip this attempt if there's an error
                         System.err.println("Error creating quiz attempt: " + e.getMessage());

@@ -8,21 +8,20 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import jakarta.servlet.http.HttpSession;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class DashboardController {
     
-    private final UserService userService;
     private final QuizService quizService;
     private final QuizAttemptService quizAttemptService;
     
-    public DashboardController(UserService userService, 
-                             QuizService quizService,
+    public DashboardController(QuizService quizService,
                              QuizAttemptService quizAttemptService) {
-        this.userService = userService;
         this.quizService = quizService;
         this.quizAttemptService = quizAttemptService;
     }
@@ -30,13 +29,22 @@ public class DashboardController {
     @GetMapping("/dashboard")
     public String dashboard(@RequestParam(value = "role", required = false) String role,
                            Authentication authentication, 
+                           HttpSession session,
                            Model model) {
-        // Check if user is authenticated
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
+        // Check session-based authentication first
+        User sessionUser = (User) session.getAttribute("user");
+        User user = null;
+        
+        if (sessionUser != null) {
+            user = sessionUser;
+        } else if (authentication != null && authentication.isAuthenticated()) {
+            user = (User) authentication.getPrincipal();
         }
         
-        User user = (User) authentication.getPrincipal();
+        // If no user found, redirect to login
+        if (user == null) {
+            return "redirect:/login";
+        }
         
         // Determine dashboard based on user role or role parameter
         Role userRole = user.getRole();
@@ -56,25 +64,47 @@ public class DashboardController {
         // Prepare dashboard data based on user role
         if (userRole == Role.TEACHER) {
             prepareTeacherDashboardData(model, user);
+            return "teacher/dashboard";
         } else {
             prepareStudentDashboardData(model, user);
+            return "student/dashboard";
         }
-        
-        return "user/dashboard";
     }
     
     private void prepareStudentDashboardData(Model model, User user) {
         // Basic user data
         model.addAttribute("user", user);
+        model.addAttribute("student", user);
         model.addAttribute("pageTitle", "Student Dashboard - QWIZZ");
         model.addAttribute("userRole", "student");
+        model.addAttribute("currentUser", user);
         
-        // Student statistics
+        // Student statistics with enhanced data
         Map<String, Object> stats = new HashMap<>();
-        stats.put("totalQuizzesTaken", user.getTotalQuizzesTaken() != null ? user.getTotalQuizzesTaken() : 0);
-        stats.put("totalPoints", user.getTotalPoints() != null ? user.getTotalPoints() : 0);
-        stats.put("quizStreak", user.getQuizStreak() != null ? user.getQuizStreak() : 0);
-        stats.put("averageScore", user.getAverageScore() != null ? user.getAverageScore() : 0.0);
+        
+        // Get user's quiz attempts for accurate statistics
+        List<QuizAttempt> userAttempts = quizAttemptService.getAttemptsByUser(user.getId());
+        List<QuizAttempt> completedAttempts = userAttempts.stream()
+                .filter(QuizAttempt::isCompleted)
+                .collect(Collectors.toList());
+        
+        // Calculate accurate statistics
+        int totalQuizzesTaken = completedAttempts.size();
+        double averageScore = completedAttempts.stream()
+                .mapToDouble(QuizAttempt::getPercentage)
+                .average()
+                .orElse(0.0);
+        int totalPoints = (int) completedAttempts.stream()
+                .mapToDouble(attempt -> attempt.getPercentage() * 10) // 10 points per percent
+                .sum();
+        
+        // Quiz streak calculation
+        int currentStreak = calculateQuizStreak(completedAttempts);
+        
+        stats.put("totalQuizzesTaken", totalQuizzesTaken);
+        stats.put("totalPoints", totalPoints);
+        stats.put("quizStreak", currentStreak);
+        stats.put("averageScore", averageScore);
         model.addAttribute("stats", stats);
         
         // Available quizzes for student
@@ -83,83 +113,192 @@ public class DashboardController {
         
         // Dashboard statistics
         model.addAttribute("totalQuizzes", availableQuizzes.size());
-        model.addAttribute("completedQuizzes", user.getTotalQuizzesTaken() != null ? user.getTotalQuizzesTaken() : 0);
-        model.addAttribute("averageScore", user.getAverageScore() != null ? user.getAverageScore().intValue() : 0);
+        model.addAttribute("completedQuizzes", totalQuizzesTaken);
+        model.addAttribute("averageScore", (int) Math.round(averageScore));
         
-        // User rank (simple calculation based on points)
-        Integer globalRank = calculateGlobalRank(user);
+        // User rank calculation
+        Integer globalRank = calculateGlobalRank(user, totalPoints);
         model.addAttribute("userRank", globalRank != null ? "#" + globalRank : "#1");
         
-        // Recent attempts
-        List<QuizAttempt> recentAttempts = quizAttemptService.getRecentAttemptsByUser(user.getId(), 5);
+        // Recent attempts (last 5)
+        List<QuizAttempt> recentAttempts = completedAttempts.stream()
+                .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
+                .limit(5)
+                .collect(Collectors.toList());
         model.addAttribute("recentAttempts", recentAttempts);
         
-        // Activity message
+        // Activity data
         model.addAttribute("welcomeMessage", "Welcome back, " + user.getFirstName() + "! Ready to take some quizzes?");
+        model.addAttribute("lastLogin", formatDateTime(LocalDateTime.now()));
+        
+        // Performance insights
+        Map<String, Object> insights = new HashMap<>();
+        insights.put("bestSubject", getBestSubject(completedAttempts));
+        insights.put("improvementArea", getImprovementArea(completedAttempts));
+        insights.put("weeklyProgress", getWeeklyProgress(completedAttempts));
+        model.addAttribute("insights", insights);
     }
     
     private void prepareTeacherDashboardData(Model model, User user) {
         // Basic user data
         model.addAttribute("user", user);
+        model.addAttribute("teacher", user);
         model.addAttribute("pageTitle", "Teacher Dashboard - QWIZZ");
         model.addAttribute("userRole", "teacher");
+        model.addAttribute("currentUser", user);
         
         // Teacher-specific data
         List<Quiz> createdQuizzes = quizService.getQuizzesByCreator(user.getId());
-        model.addAttribute("recentQuizzes", createdQuizzes.size() > 10 ? createdQuizzes.subList(0, 10) : createdQuizzes);
+        List<Quiz> recentQuizzes = createdQuizzes.stream()
+                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .limit(10)
+                .collect(Collectors.toList());
+        model.addAttribute("recentQuizzes", recentQuizzes);
         
-        // Quiz statistics
+        // Enhanced analytics
         Map<String, Object> analytics = new HashMap<>();
-        analytics.put("totalQuizzesCreated", user.getTotalQuizzesCreated() != null ? user.getTotalQuizzesCreated() : 0);
-        analytics.put("totalStudentAttempts", calculateTotalAttemptsOnCreatedQuizzes(user.getId()));
-        analytics.put("averageQuizScore", calculateAverageQuizRating(user.getId()));
+        
+        // Total quizzes created
+        int totalQuizzesCreated = createdQuizzes.size();
+        
+        // Get all attempts on teacher's quizzes
+        List<QuizAttempt> allAttemptsOnMyQuizzes = new ArrayList<>();
+        for (Quiz quiz : createdQuizzes) {
+            List<QuizAttempt> quizAttempts = quizAttemptService.getAttemptsByQuizId(quiz.getId());
+            allAttemptsOnMyQuizzes.addAll(quizAttempts);
+        }
+        
+        // Calculate statistics
+        int totalStudentAttempts = allAttemptsOnMyQuizzes.size();
+        double averageQuizScore = allAttemptsOnMyQuizzes.stream()
+                .filter(QuizAttempt::isCompleted)
+                .mapToDouble(QuizAttempt::getPercentage)
+                .average()
+                .orElse(0.0);
+        
+        // Unique students who took quizzes
+        long uniqueStudents = allAttemptsOnMyQuizzes.stream()
+                .map(QuizAttempt::getUser)
+                .distinct()
+                .count();
+        
+        analytics.put("totalQuizzesCreated", totalQuizzesCreated);
+        analytics.put("totalStudentAttempts", totalStudentAttempts);
+        analytics.put("averageQuizScore", Math.round(averageQuizScore * 100.0) / 100.0);
+        analytics.put("uniqueStudents", uniqueStudents);
+        analytics.put("popularQuiz", getMostPopularQuiz(createdQuizzes));
         model.addAttribute("analytics", analytics);
         
         // Recent quiz attempts on teacher's quizzes
-        List<QuizAttempt> recentAttemptsOnMyQuizzes = quizAttemptService.getRecentAttemptsByQuizCreator(user.getId(), 10);
-        model.addAttribute("recentAttemptsOnMyQuizzes", recentAttemptsOnMyQuizzes);
+        List<QuizAttempt> recentAttemptsOnMyQuizzes = allAttemptsOnMyQuizzes.stream()
+                .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
+                .limit(10)
+                .collect(Collectors.toList());
+        model.addAttribute("recentAttempts", recentAttemptsOnMyQuizzes);
+        
+        // Quick stats for dashboard cards
+        model.addAttribute("totalQuizzes", totalQuizzesCreated);
+        model.addAttribute("totalStudents", uniqueStudents);
+        model.addAttribute("averageScore", (int) Math.round(averageQuizScore));
+        model.addAttribute("totalAttempts", totalStudentAttempts);
         
         // Activity message
         model.addAttribute("welcomeMessage", "Welcome back, " + user.getFirstName() + "! Your quizzes are ready for students.");
+        model.addAttribute("lastLogin", formatDateTime(LocalDateTime.now()));
+        
+        // Teaching insights
+        Map<String, Object> insights = new HashMap<>();
+        insights.put("mostActiveDay", getMostActiveDay(allAttemptsOnMyQuizzes));
+        insights.put("averageCompletionTime", getAverageCompletionTime(allAttemptsOnMyQuizzes));
+        insights.put("successRate", getOverallSuccessRate(allAttemptsOnMyQuizzes));
+        model.addAttribute("insights", insights);
     }
     
-    private Integer calculateGlobalRank(User user) {
-        try {
-            List<User> topUsers = userService.getTopUsersByPoints();
-            for (int i = 0; i < topUsers.size(); i++) {
-                if (topUsers.get(i).getId().equals(user.getId())) {
-                    return i + 1;
-                }
+    // Helper methods for enhanced analytics
+    
+    private int calculateQuizStreak(List<QuizAttempt> attempts) {
+        if (attempts.isEmpty()) return 0;
+        
+        attempts.sort((a, b) -> b.getStartTime().compareTo(a.getStartTime()));
+        int streak = 0;
+        
+        for (QuizAttempt attempt : attempts) {
+            if (attempt.getPercentage() >= 70.0) { // Consider 70% as passing
+                streak++;
+            } else {
+                break;
             }
-        } catch (Exception e) {
-            // If method doesn't exist, return default
-            return 1;
-        }
-        return null; // User not in top rankings
-    }
-    
-    private int calculateTotalAttemptsOnCreatedQuizzes(Long creatorId) {
-        List<Quiz> createdQuizzes = quizService.getQuizzesByCreator(creatorId);
-        return createdQuizzes.stream()
-                .mapToInt(quiz -> quiz.getTotalAttempts() != null ? quiz.getTotalAttempts() : 0)
-                .sum();
-    }
-    
-    private double calculateAverageQuizRating(Long creatorId) {
-        List<Quiz> createdQuizzes = quizService.getQuizzesByCreator(creatorId);
-        if (createdQuizzes.isEmpty()) {
-            return 0.0;
         }
         
-        double totalRating = createdQuizzes.stream()
-                .filter(quiz -> quiz.getAverageScore() != null)
-                .mapToDouble(Quiz::getAverageScore)
-                .sum();
+        return streak;
+    }
+    
+    private Integer calculateGlobalRank(User user, int totalPoints) {
+        // Simple ranking based on points - in real app, you'd query all users
+        return 1; // Simplified for now
+    }
+    
+    private String getBestSubject(List<QuizAttempt> attempts) {
+        // Simplified - you could analyze quiz categories/subjects
+        return "Java Programming";
+    }
+    
+    private String getImprovementArea(List<QuizAttempt> attempts) {
+        // Simplified - you could analyze poor-performing categories
+        return "Data Structures";
+    }
+    
+    private String getWeeklyProgress(List<QuizAttempt> attempts) {
+        long thisWeekAttempts = attempts.stream()
+                .filter(attempt -> attempt.getStartTime().isAfter(LocalDateTime.now().minusWeeks(1)))
+                .count();
+        return thisWeekAttempts > 0 ? "+" + thisWeekAttempts + " quizzes this week" : "No activity this week";
+    }
+    
+    private String getMostPopularQuiz(List<Quiz> quizzes) {
+        return quizzes.stream()
+                .max(Comparator.comparing(quiz -> quiz.getTotalAttempts() != null ? quiz.getTotalAttempts() : 0))
+                .map(Quiz::getTitle)
+                .orElse("No quizzes yet");
+    }
+    
+    private String getMostActiveDay(List<QuizAttempt> attempts) {
+        Map<String, Long> dayCount = attempts.stream()
+                .collect(Collectors.groupingBy(
+                    attempt -> attempt.getStartTime().getDayOfWeek().toString(),
+                    Collectors.counting()
+                ));
         
-        long ratedQuizzes = createdQuizzes.stream()
-                .filter(quiz -> quiz.getAverageScore() != null)
+        return dayCount.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("No data");
+    }
+    
+    private String getAverageCompletionTime(List<QuizAttempt> attempts) {
+        double avgTime = attempts.stream()
+                .filter(QuizAttempt::isCompleted)
+                .mapToDouble(attempt -> attempt.getTimeTaken() != null ? attempt.getTimeTaken() : 0)
+                .average()
+                .orElse(0.0);
+        
+        return String.format("%.1f minutes", avgTime / 60.0);
+    }
+    
+    private String getOverallSuccessRate(List<QuizAttempt> attempts) {
+        long totalCompleted = attempts.stream().filter(QuizAttempt::isCompleted).count();
+        long passed = attempts.stream()
+                .filter(QuizAttempt::isCompleted)
+                .filter(attempt -> attempt.getPercentage() >= 70.0)
                 .count();
         
-        return ratedQuizzes > 0 ? totalRating / ratedQuizzes : 0.0;
+        if (totalCompleted == 0) return "No data";
+        
+        double successRate = (double) passed / totalCompleted * 100;
+        return String.format("%.1f%%", successRate);
+    }
+    
+    private String formatDateTime(LocalDateTime dateTime) {
+        return dateTime.format(DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' HH:mm"));
     }
 }

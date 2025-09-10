@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz - QWIZZ</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Use the same brutalist theme as dashboard */
+        :root {
+            --primary: #FF6B35;
+            --secondary: #FF3366;
+            --accent: #00D2FF;
+            --success: #00F5A0;
+            --warning: #FFE66D;
+            --purple: #9D4EDD;
+            --danger: #FF5E5B;
+            --dark: #1A1B23;
+            --light: #F8F9FA;
+            --white: #FFFFFF;
+            --black: #000000;
+            
+            --font-bold: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+            --font-regular: 'Arial', 'Helvetica Neue', sans-serif;
+            
+            --border-thick: 4px solid var(--black);
+            --border-thin: 2px solid var(--black);
+            --shadow-brutal: 8px 8px 0px var(--black);
+            --shadow-small: 4px 4px 0px var(--black);
+            --radius: 0px;
+            
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-regular);
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--purple) 0%, var(--accent) 100%);
+            padding: var(--spacing-lg) 0;
+            text-align: center;
+            border-bottom: var(--border-thick);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .header h1 {
+            font-family: var(--font-bold);
+            font-size: 3rem;
+            color: var(--white);
+            text-shadow: 4px 4px 0px var(--black);
+            text-transform: uppercase;
+        }
+
+        .form-card {
+            background: var(--white);
+            border: var(--border-thick);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-brutal);
+            transform: rotate(-0.5deg);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-family: var(--font-bold);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: var(--spacing-sm);
+            color: var(--black);
+            font-size: 1.1rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: var(--border-thick);
+            font-size: 1rem;
+            font-family: var(--font-regular);
+            background: var(--light);
+            color: var(--dark);
+            box-shadow: var(--shadow-small);
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            background: var(--white);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .form-textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        .btn {
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-family: var(--font-bold);
+            font-weight: 900;
+            text-decoration: none;
+            text-transform: uppercase;
+            border: var(--border-thick);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            box-shadow: var(--shadow-small);
+            font-size: 1rem;
+            border-radius: var(--radius);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--black);
+        }
+
+        .btn-secondary:hover {
+            background: var(--warning);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            margin-top: var(--spacing-xl);
+        }
+
+        .alert {
+            padding: var(--spacing-md);
+            border: var(--border-thick);
+            margin-bottom: var(--spacing-lg);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .alert-success {
+            background: var(--success);
+            color: var(--black);
+        }
+
+        .alert-error {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .floating-nav {
+            position: fixed;
+            top: var(--spacing-md);
+            left: var(--spacing-md);
+            z-index: 1000;
+        }
+
+        .floating-nav a {
+            background: var(--accent);
+            color: var(--black);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: var(--border-thick);
+            text-decoration: none;
+            font-family: var(--font-bold);
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-small);
+            transition: all 0.3s ease;
+        }
+
+        .floating-nav a:hover {
+            background: var(--warning);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating Back Navigation -->
+    <div class="floating-nav">
+        <a href="/dashboard">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Create New Quiz</h1>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${successMessage}">Quiz created successfully!</span>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span th:text="${errorMessage}">Error creating quiz!</span>
+        </div>
+
+        <!-- Quiz Creation Form -->
+        <div class="form-card">
+            <form method="post" th:action="@{/teacher/quiz/create}" th:object="${quiz}">
+                <div class="form-group">
+                    <label for="title" class="form-label">
+                        <i class="fas fa-heading"></i>
+                        Quiz Title
+                    </label>
+                    <input type="text" 
+                           id="title" 
+                           name="title" 
+                           th:field="*{title}"
+                           class="form-input" 
+                           placeholder="Enter quiz title..." 
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label">
+                        <i class="fas fa-align-left"></i>
+                        Description
+                    </label>
+                    <textarea id="description" 
+                              name="description" 
+                              th:field="*{description}"
+                              class="form-textarea" 
+                              placeholder="Describe what this quiz covers..."
+                              required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="difficulty" class="form-label">
+                            <i class="fas fa-signal"></i>
+                            Difficulty Level
+                        </label>
+                        <select id="difficulty" 
+                                name="difficulty" 
+                                th:field="*{difficulty}"
+                                class="form-select" 
+                                required>
+                            <option value="">Select Difficulty</option>
+                            <option th:each="diff : ${difficulties}" 
+                                    th:value="${diff}" 
+                                    th:text="${diff}">EASY</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timeLimit" class="form-label">
+                            <i class="fas fa-clock"></i>
+                            Time Limit (minutes)
+                        </label>
+                        <input type="number" 
+                               id="timeLimit" 
+                               name="timeLimit" 
+                               th:field="*{timeLimit}"
+                               class="form-input" 
+                               placeholder="30" 
+                               min="1" 
+                               max="300"
+                               required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="passingScore" class="form-label">
+                            <i class="fas fa-percentage"></i>
+                            Passing Score (%)
+                        </label>
+                        <input type="number" 
+                               id="passingScore" 
+                               name="passingScore" 
+                               th:field="*{passingScore}"
+                               class="form-input" 
+                               placeholder="70" 
+                               min="0" 
+                               max="100"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="isPublic" class="form-label">
+                            <i class="fas fa-eye"></i>
+                            Visibility
+                        </label>
+                        <select id="isPublic" 
+                                name="isPublic" 
+                                th:field="*{isPublic}"
+                                class="form-select">
+                            <option value="true">Public (All students can see)</option>
+                            <option value="false">Private (Invite only)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="instructions" class="form-label">
+                        <i class="fas fa-list-ol"></i>
+                        Instructions for Students
+                    </label>
+                    <textarea id="instructions" 
+                              name="instructions" 
+                              th:field="*{instructions}"
+                              class="form-textarea" 
+                              placeholder="Enter any special instructions for taking this quiz..."></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <a href="/dashboard" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Create Quiz
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.form-input, .form-select, .form-textarea');
+            
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.transform = 'translate(-2px, -2px)';
+                    this.style.boxShadow = 'var(--shadow-brutal)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.style.transform = '';
+                    this.style.boxShadow = 'var(--shadow-small)';
+                });
+            });
+
+            // Form validation feedback
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                const title = document.getElementById('title').value.trim();
+                const description = document.getElementById('description').value.trim();
+                
+                if (title.length < 3) {
+                    e.preventDefault();
+                    alert('Quiz title must be at least 3 characters long!');
+                    return;
+                }
+                
+                if (description.length < 10) {
+                    e.preventDefault();
+                    alert('Quiz description must be at least 10 characters long!');
+                    return;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

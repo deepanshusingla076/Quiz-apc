@@ -21,6 +21,26 @@ public class QuizAttemptService {
     @Autowired
     private QuizService quizService;
 
+    public QuizAttempt startQuizAttempt(QuizAttempt attempt) {
+        return quizAttemptRepository.save(attempt);
+    }
+
+    public QuizAttempt updateQuizAttempt(QuizAttempt attempt) {
+        return quizAttemptRepository.save(attempt);
+    }
+
+    public List<QuizAttempt> getAttemptsByUser(Long userId) {
+        return quizAttemptRepository.findByUser_IdOrderByStartTimeDesc(userId);
+    }
+
+    public List<QuizAttempt> getAttemptsByQuizId(Long quizId) {
+        return quizAttemptRepository.findByQuiz_IdOrderByStartTimeDesc(quizId);
+    }
+
+    public List<QuizAttempt> getAttemptsByUserAndQuiz(Long userId, Long quizId) {
+        return quizAttemptRepository.findByUser_IdAndQuiz_IdOrderByStartTimeDesc(userId, quizId);
+    }
+
     public QuizAttempt startQuizAttempt(Long userId, Long quizId) {
         // Check if there's already an active attempt
         Optional<QuizAttempt> activeAttempt = quizAttemptRepository.findActiveAttemptByUserIdAndQuizId(userId, quizId);

@@ -303,7 +303,9 @@ public class Quiz {
         if (this.totalAttempts == null || this.totalAttempts == 0) {
             this.averageScore = newScore;
         } else {
-            double totalScore = this.averageScore * (this.totalAttempts - 1);
+            // Ensure averageScore is not null before calculation
+            double currentAverage = this.averageScore != null ? this.averageScore : 0.0;
+            double totalScore = currentAverage * (this.totalAttempts - 1);
             this.averageScore = (totalScore + newScore) / this.totalAttempts;
         }
     }

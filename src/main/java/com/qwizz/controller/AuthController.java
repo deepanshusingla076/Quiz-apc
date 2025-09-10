@@ -102,6 +102,14 @@ public class AuthController {
         return "auth/register";
     }
 
+    @GetMapping("/signup")
+    public String signupPage(Model model) {
+        model.addAttribute("pageTitle", "Register - QWIZZ");
+        model.addAttribute("user", new User());
+        model.addAttribute("roles", Role.values());
+        return "auth/register";
+    }
+
     @PostMapping("/register")
     public String register(@ModelAttribute User user,
                           @RequestParam String confirmPassword,
@@ -146,6 +154,83 @@ public class AuthController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Registration failed: " + e.getMessage());
             return "redirect:/register";
+        }
+    }
+
+    @PostMapping("/api/register")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> registerJson(@RequestBody Map<String, String> userData) {
+        try {
+            String firstName = userData.get("firstName");
+            String lastName = userData.get("lastName");
+            String username = userData.get("username");
+            String email = userData.get("email");
+            String password = userData.get("password");
+            String confirmPassword = userData.get("confirmPassword");
+            String role = userData.get("role");
+            
+            if (!password.equals(confirmPassword)) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("message", "Passwords do not match");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            if (username == null || username.trim().isEmpty()) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("message", "Username is required");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            if (email == null || email.trim().isEmpty()) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("message", "Email is required");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            if (password == null || password.length() < 6) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("message", "Password must be at least 6 characters long");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            User user = new User();
+            user.setFirstName(firstName.trim());
+            user.setLastName(lastName.trim());
+            user.setUsername(username.trim());
+            user.setEmail(email.trim());
+            user.setPassword(password);
+
+            try {
+                user.setRole(Role.valueOf(role.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                user.setRole(Role.STUDENT);
+            }
+
+            User savedUser = userService.registerUser(user);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Registration successful! Welcome to QWIZZ, " + savedUser.getFirstName() + "!");
+            response.put("user", Map.of(
+                "id", savedUser.getId(),
+                "username", savedUser.getUsername(),
+                "email", savedUser.getEmail(),
+                "firstName", savedUser.getFirstName(),
+                "lastName", savedUser.getLastName(),
+                "role", savedUser.getRole().toString()
+            ));
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Registration failed: " + e.getMessage());
+            return ResponseEntity.badRequest().body(error);
         }
     }
 

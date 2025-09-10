@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${quiz.title} + ' - Results - QWIZZ'">Quiz Results - QWIZZ</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Brutalist theme for results */
+        :root {
+            --primary: #FF6B35;
+            --secondary: #FF3366;
+            --accent: #00D2FF;
+            --success: #00F5A0;
+            --warning: #FFE66D;
+            --purple: #9D4EDD;
+            --danger: #FF5E5B;
+            --dark: #1A1B23;
+            --light: #F8F9FA;
+            --white: #FFFFFF;
+            --black: #000000;
+            
+            --font-bold: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+            --font-regular: 'Arial', 'Helvetica Neue', sans-serif;
+            
+            --border-thick: 4px solid var(--black);
+            --border-thin: 2px solid var(--black);
+            --shadow-brutal: 8px 8px 0px var(--black);
+            --shadow-small: 4px 4px 0px var(--black);
+            --radius: 0px;
+            
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-regular);
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+
+        .results-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: var(--spacing-xl) 0;
+            text-align: center;
+            border-bottom: var(--border-thick);
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .results-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(45deg, 
+                    transparent, 
+                    transparent 20px, 
+                    rgba(0,0,0,0.1) 20px, 
+                    rgba(0,0,0,0.1) 40px);
+            animation: slide 4s linear infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translateX(-40px); }
+            100% { transform: translateX(0px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .results-header h1 {
+            font-family: var(--font-bold);
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: var(--white);
+            text-shadow: 4px 4px 0px var(--black);
+            text-transform: uppercase;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .quiz-title {
+            font-size: 1.2rem;
+            color: var(--white);
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        .score-display {
+            background: var(--white);
+            border: var(--border-thick);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+            box-shadow: var(--shadow-brutal);
+            transform: rotate(-1deg);
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border: 8px solid var(--black);
+            border-radius: 50%;
+            margin: 0 auto var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .score-circle.excellent {
+            background: var(--success);
+            color: var(--black);
+        }
+
+        .score-circle.good {
+            background: var(--warning);
+            color: var(--black);
+        }
+
+        .score-circle.fair {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        .score-circle.poor {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .score-percentage {
+            font-family: var(--font-bold);
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-family: var(--font-bold);
+            font-size: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-top: var(--spacing-xs);
+        }
+
+        .score-status {
+            font-family: var(--font-bold);
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-top: var(--spacing-md);
+        }
+
+        .score-status.passed {
+            color: var(--success);
+        }
+
+        .score-status.failed {
+            color: var(--danger);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: var(--border-thick);
+            padding: var(--spacing-lg);
+            text-align: center;
+            box-shadow: var(--shadow-small);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .stat-number {
+            font-family: var(--font-bold);
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stat-label {
+            font-family: var(--font-bold);
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--black);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stat-description {
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        .content-sections {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--spacing-xl);
+        }
+
+        .main-content,
+        .sidebar {
+            background: var(--white);
+            border: var(--border-thick);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .main-content {
+            transform: rotate(-0.3deg);
+        }
+
+        .sidebar {
+            transform: rotate(0.3deg);
+        }
+
+        .section-title {
+            font-family: var(--font-bold);
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--black);
+            margin-bottom: var(--spacing-lg);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .section-title::before {
+            content: '';
+            width: 6px;
+            height: 30px;
+            background: var(--primary);
+            border: 2px solid var(--black);
+            box-shadow: var(--shadow-small);
+        }
+
+        .question-review {
+            margin-bottom: var(--spacing-lg);
+            border: var(--border-thin);
+            background: var(--light);
+            overflow: hidden;
+        }
+
+        .question-header {
+            padding: var(--spacing-md);
+            background: var(--black);
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .question-number {
+            font-family: var(--font-bold);
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .question-result {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border: 2px solid var(--white);
+            font-family: var(--font-bold);
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .question-result.correct {
+            background: var(--success);
+            color: var(--black);
+        }
+
+        .question-result.incorrect {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .question-result.unanswered {
+            background: var(--warning);
+            color: var(--black);
+        }
+
+        .question-content {
+            padding: var(--spacing-md);
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--black);
+        }
+
+        .answer-option {
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-xs);
+            border: var(--border-thin);
+            background: var(--white);
+        }
+
+        .answer-option.correct {
+            background: var(--success);
+            color: var(--black);
+            font-weight: 700;
+        }
+
+        .answer-option.selected {
+            background: var(--accent);
+            color: var(--black);
+            font-weight: 700;
+        }
+
+        .answer-option.selected.incorrect {
+            background: var(--danger);
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        .btn {
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-family: var(--font-bold);
+            font-weight: 900;
+            text-decoration: none;
+            text-transform: uppercase;
+            border: var(--border-thick);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            box-shadow: var(--shadow-small);
+            font-size: 1rem;
+            border-radius: var(--radius);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--black);
+        }
+
+        .btn-secondary:hover {
+            background: var(--warning);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--black);
+        }
+
+        .btn-success:hover {
+            background: var(--accent);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .actions-section {
+            background: var(--accent);
+            border: var(--border-thick);
+            padding: var(--spacing-lg);
+            text-align: center;
+            margin-top: var(--spacing-lg);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .actions-section h3 {
+            font-family: var(--font-bold);
+            font-size: 1.5rem;
+            color: var(--black);
+            margin-bottom: var(--spacing-md);
+            text-transform: uppercase;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .floating-nav {
+            position: fixed;
+            top: var(--spacing-md);
+            left: var(--spacing-md);
+            z-index: 1000;
+        }
+
+        .floating-nav a {
+            background: var(--accent);
+            color: var(--black);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: var(--border-thick);
+            text-decoration: none;
+            font-family: var(--font-bold);
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-small);
+            transition: all 0.3s ease;
+        }
+
+        .floating-nav a:hover {
+            background: var(--warning);
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-brutal);
+        }
+
+        .feedback-section {
+            background: var(--light);
+            border: var(--border-thin);
+            padding: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            box-shadow: var(--shadow-small);
+        }
+
+        .feedback-section h4 {
+            font-family: var(--font-bold);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: var(--spacing-sm);
+            color: var(--black);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+            font-size: 0.9rem;
+        }
+
+        .timeline-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border: 2px solid var(--black);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .content-sections {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-lg);
+            }
+            
+            .main-content,
+            .sidebar {
+                transform: rotate(0deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-circle {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .score-percentage {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating Back Navigation -->
+    <div class="floating-nav">
+        <a href="/dashboard">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Results Header -->
+    <div class="results-header">
+        <div class="header-content">
+            <h1>Quiz Complete!</h1>
+            <div class="quiz-title" th:text="${quiz.title}">Java Fundamentals Quiz</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Score Display -->
+        <div class="score-display">
+            <div th:class="'score-circle ' + (${attempt.percentage >= 80} ? 'excellent' : (${attempt.percentage >= 70} ? 'good' : (${attempt.percentage >= 60} ? 'fair' : 'poor')))">
+                <div class="score-percentage" th:text="${#numbers.formatDecimal(attempt.percentage, 1, 0)} + '%'">85%</div>
+                <div class="score-label">Score</div>
+            </div>
+            <div th:class="'score-status ' + (${attempt.percentage >= (quiz.passingScore ?: 70)} ? 'passed' : 'failed')"
+                 th:text="${attempt.percentage >= (quiz.passingScore ?: 70)} ? 'PASSED' : 'FAILED'">PASSED</div>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" th:text="${correctAnswers}">12</div>
+                <div class="stat-label">Correct Answers</div>
+                <div class="stat-description">Out of <span th:text="${totalQuestions}">15</span> questions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${totalQuestions - correctAnswers}">3</div>
+                <div class="stat-label">Incorrect</div>
+                <div class="stat-description">Questions missed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${#numbers.formatDecimal(attempt.timeTaken / 60.0, 1, 1)}">23.5</div>
+                <div class="stat-label">Time Taken</div>
+                <div class="stat-description">Minutes used</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${quiz.passingScore ?: 70}">70</div>
+                <div class="stat-label">Passing Score</div>
+                <div class="stat-description">Required percentage</div>
+            </div>
+        </div>
+
+        <!-- Content Sections -->
+        <div class="content-sections">
+            <!-- Question Review -->
+            <div class="main-content">
+                <h2 class="section-title">
+                    <i class="fas fa-list-check"></i>
+                    Question Review
+                </h2>
+
+                <div th:each="questionResult : ${questionResults}" class="question-review">
+                    <div class="question-header">
+                        <div class="question-number" th:text="'Question ' + ${questionResult.questionNumber}">Question 1</div>
+                        <div th:class="'question-result ' + ${questionResult.correct ? 'correct' : (questionResult.answered ? 'incorrect' : 'unanswered')}"
+                             th:text="${questionResult.correct ? 'Correct' : (questionResult.answered ? 'Incorrect' : 'Not Answered')}">
+                            Correct
+                        </div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text" th:text="${questionResult.questionText}">
+                            What is the correct way to declare a variable in Java?
+                        </div>
+                        <div th:each="option : ${questionResult.options}" 
+                             th:class="'answer-option ' + (${option == questionResult.correctAnswer} ? 'correct' : '') + ' ' + (${option == questionResult.selectedAnswer and option != questionResult.correctAnswer} ? 'selected incorrect' : '') + ' ' + (${option == questionResult.selectedAnswer and option == questionResult.correctAnswer} ? 'selected' : '')">
+                            <i th:if="${option == questionResult.correctAnswer}" class="fas fa-check" style="color: var(--black); margin-right: var(--spacing-xs);"></i>
+                            <i th:if="${option == questionResult.selectedAnswer and option != questionResult.correctAnswer}" class="fas fa-times" style="color: var(--white); margin-right: var(--spacing-xs);"></i>
+                            <span th:text="${option}">int variable = 10;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Performance
+                </h3>
+
+                <!-- Performance Breakdown -->
+                <div style="margin-bottom: var(--spacing-lg);">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm);">
+                        <div style="background: var(--light); padding: var(--spacing-sm); border: var(--border-thin); text-align: center;">
+                            <div style="font-family: var(--font-bold); font-size: 1.5rem; color: var(--success);" 
+                                 th:text="${#numbers.formatDecimal((correctAnswers * 100.0) / totalQuestions, 1, 0)} + '%'">80%</div>
+                            <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Accuracy</div>
+                        </div>
+                        <div style="background: var(--light); padding: var(--spacing-sm); border: var(--border-thin); text-align: center;">
+                            <div style="font-family: var(--font-bold); font-size: 1.5rem; color: var(--primary);" 
+                                 th:text="${#numbers.formatDecimal(attempt.timeTaken / totalQuestions, 1, 1)}">1.6</div>
+                            <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Min/Question</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="feedback-section">
+                    <h4>
+                        <i class="fas fa-clock"></i>
+                        Timeline
+                    </h4>
+                    <div class="timeline-item">
+                        <div class="timeline-icon"></div>
+                        <span>Started: <strong th:text="${#temporals.format(attempt.startTime, 'HH:mm')}">14:30</strong></span>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-icon"></div>
+                        <span>Completed: <strong th:text="${#temporals.format(attempt.endTime, 'HH:mm')}">15:15</strong></span>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-icon"></div>
+                        <span>Duration: <strong th:text="${#numbers.formatDecimal(attempt.timeTaken / 60.0, 1, 1)} + ' minutes'">45.5 minutes</strong></span>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div class="feedback-section" th:if="${quiz.difficulty}">
+                    <h4>
+                        <i class="fas fa-lightbulb"></i>
+                        Feedback
+                    </h4>
+                    <div th:switch="${attempt.percentage}">
+                        <p th:case="${attempt.percentage >= 90}">
+                            <strong>Excellent work!</strong> You have a strong understanding of the material.
+                        </p>
+                        <p th:case="${attempt.percentage >= 80}">
+                            <strong>Great job!</strong> You're doing well. Review the missed questions to improve further.
+                        </p>
+                        <p th:case="${attempt.percentage >= 70}">
+                            <strong>Good effort!</strong> You passed, but consider reviewing the material for better understanding.
+                        </p>
+                        <p th:case="${attempt.percentage >= 60}">
+                            <strong>Fair attempt.</strong> You may want to study more before retaking this quiz.
+                        </p>
+                        <p th:case="*">
+                            <strong>Keep studying!</strong> Review the material thoroughly and try again when ready.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Previous Attempts -->
+                <div th:if="${!#lists.isEmpty(previousAttempts)}" class="feedback-section">
+                    <h4>
+                        <i class="fas fa-history"></i>
+                        Previous Attempts
+                    </h4>
+                    <div th:each="prevAttempt : ${previousAttempts}" 
+                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-xs); padding: var(--spacing-xs); background: var(--white); border: 1px solid var(--black);">
+                        <span th:text="${#temporals.format(prevAttempt.startTime, 'MMM dd')}">Mar 15</span>
+                        <span th:text="${prevAttempt.percentage} + '%'" 
+                              th:style="'color: ' + (${prevAttempt.percentage >= 70} ? 'var(--success)' : 'var(--danger)') + '; font-weight: 700;'">75%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Section -->
+        <div class="actions-section">
+            <h3>What's Next?</h3>
+            <p style="margin-bottom: var(--spacing-md); font-weight: 600;">
+                Choose your next action to continue your learning journey.
+            </p>
+            <div class="actions-grid">
+                <a href="/dashboard" class="btn btn-primary">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+                <a th:href="@{/student/quiz/{id}/details(id=${quiz.id})}" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i>
+                    Retake Quiz
+                </a>
+                <a href="#" class="btn btn-secondary">
+                    <i class="fas fa-share"></i>
+                    Share Results
+                </a>
+                <a href="#" class="btn btn-success">
+                    <i class="fas fa-download"></i>
+                    Download Certificate
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate score circle
+            const scoreCircle = document.querySelector('.score-circle');
+            const scorePercentage = parseFloat(scoreCircle.querySelector('.score-percentage').textContent);
+            
+            // Add a subtle animation
+            setTimeout(() => {
+                scoreCircle.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    scoreCircle.style.transform = 'scale(1)';
+                }, 300);
+            }, 500);
+
+            // Animate stat cards
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        card.style.transform = 'translateY(0)';
+                    }, 300);
+                }, index * 100);
+            });
+
+            // Add hover effects to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // Scroll to show question reviews
+            const questionReviews = document.querySelectorAll('.question-review');
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            questionReviews.forEach((review, index) => {
+                review.style.opacity = '0';
+                review.style.transform = 'translateY(20px)';
+                review.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                review.style.transitionDelay = `${index * 0.1}s`;
+                observer.observe(review);
+            });
+        });
+    </script>
+</body>
+</html>

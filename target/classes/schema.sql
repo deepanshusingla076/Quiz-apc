@@ -75,6 +75,9 @@ CREATE TABLE quizzes (
     featured BOOLEAN DEFAULT FALSE,
     total_attempts INT DEFAULT 0,
     average_score DECIMAL(5,2) DEFAULT 0.00,
+    show_correct_answers BOOLEAN DEFAULT TRUE,
+    randomize_questions BOOLEAN DEFAULT FALSE,
+    instant_feedback BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     active BOOLEAN DEFAULT TRUE,
@@ -266,13 +269,13 @@ INSERT INTO users (username, email, password, first_name, last_name, role, bio, 
 ('alex_brown', 'alex.brown@qwizz.com', '$2a$10$eUz1YrEeZgqQ8Qx8VrIkVeY.Lj3rQ4X5nKmL8pQrS6tUvWxYz0A1B2', 'Alex', 'Brown', 'STUDENT', 'Mathematics enthusiast and problem solver', 1650);
 
 -- Insert Sample Quizzes (using creator_id 1 and 3 which are teachers)
-INSERT INTO quizzes (title, description, creator_id, category_id, difficulty, time_limit, max_attempts, passing_score, featured, total_attempts, average_score) VALUES
-('Java Fundamentals', 'Master the basics of Java programming including OOP concepts', 1, 1, 'MEDIUM', 30, 3, 70.00, TRUE, 45, 78.50),
-('Advanced SQL Queries', 'Complex database operations, joins, and optimization techniques', 1, 4, 'HARD', 45, 2, 75.00, TRUE, 32, 82.30),
-('Linear Algebra Basics', 'Vectors, matrices, and fundamental linear algebra operations', 3, 2, 'MEDIUM', 40, 3, 65.00, FALSE, 28, 75.20),
-('Web Development Essentials', 'HTML, CSS, JavaScript fundamentals for modern web development', 1, 1, 'EASY', 25, 5, 60.00, TRUE, 67, 85.10),
-('Physics Mechanics', 'Classical mechanics, motion, forces, and energy concepts', 3, 3, 'HARD', 50, 2, 70.00, FALSE, 19, 68.90),
-('Data Structures & Algorithms', 'Arrays, linked lists, trees, sorting, and searching algorithms', 1, 1, 'HARD', 60, 2, 80.00, TRUE, 41, 71.40);
+INSERT INTO quizzes (title, description, creator_id, category_id, difficulty, time_limit, max_attempts, passing_score, featured, total_attempts, average_score, show_correct_answers, randomize_questions, instant_feedback) VALUES
+('Java Fundamentals', 'Master the basics of Java programming including OOP concepts', 1, 1, 'MEDIUM', 30, 3, 70.00, TRUE, 45, 78.50, TRUE, FALSE, TRUE),
+('Advanced SQL Queries', 'Complex database operations, joins, and optimization techniques', 1, 4, 'HARD', 45, 2, 75.00, TRUE, 32, 82.30, TRUE, FALSE, TRUE),
+('Linear Algebra Basics', 'Vectors, matrices, and fundamental linear algebra operations', 3, 2, 'MEDIUM', 40, 3, 65.00, FALSE, 28, 75.20, TRUE, FALSE, TRUE),
+('Web Development Essentials', 'HTML, CSS, JavaScript fundamentals for modern web development', 1, 1, 'EASY', 25, 5, 60.00, TRUE, 67, 85.10, TRUE, TRUE, TRUE),
+('Physics Mechanics', 'Classical mechanics, motion, forces, and energy concepts', 3, 3, 'HARD', 50, 2, 70.00, FALSE, 19, 68.90, TRUE, FALSE, TRUE),
+('Data Structures & Algorithms', 'Arrays, linked lists, trees, sorting, and searching algorithms', 1, 1, 'HARD', 60, 2, 80.00, TRUE, 41, 71.40, TRUE, FALSE, TRUE);
 
 -- Insert Sample Questions for Java Fundamentals Quiz
 INSERT INTO questions (quiz_id, question_number, question_text, question_type, correct_answer, options, explanation, points) VALUES

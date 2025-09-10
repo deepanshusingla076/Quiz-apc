@@ -54,6 +54,7 @@ public class SecurityConfig {
                 // Public endpoints
                 .requestMatchers("/", "/home", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/check-username", "/api/check-email").permitAll()
                 .requestMatchers("/forgot-password").permitAll()
                 
                 // Teacher endpoints
