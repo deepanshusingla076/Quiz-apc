@@ -3,6 +3,7 @@
 <head>
     <title>Login - QWIZZ</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
             --primary: #FF6B35;
@@ -28,83 +29,79 @@
 
         body {
             font-family: var(--font-secondary);
-            background: linear-gradient(135deg, var(--primary) 0%, var(--brutal-pink) 50%, var(--secondary) 100%);
+            background: linear-gradient(135deg, var(--primary), var(--brutal-pink), var(--secondary));
+            background-size: 400% 400%;
+            animation: gradientMove 10s ease infinite;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
+            overflow: hidden;
+        }
+
+        /* Animated background */
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Top nav brutalist style */
+        .nav-bar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .back-to-home {
+            background: var(--white);
+            color: var(--black);
+            padding: 0.8rem 1.5rem;
+            border: var(--border-thick);
+            font-family: var(--font-primary);
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 1rem;
+            box-shadow: var(--shadow-small);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-home:hover {
+            background: var(--accent);
+            transform: translate(-3px, -3px) rotate(-2deg);
+            box-shadow: var(--shadow-brutal);
         }
 
         .auth-wrapper {
             position: relative;
             width: 100%;
-            max-width: 500px;
-            margin: 2rem;
-        }
-
-        .back-to-home {
-            position: absolute;
-            top: -60px;
-            left: 0;
-            background: var(--white);
-            color: var(--black);
-            padding: 0.75rem 1.25rem;
-            border: var(--border-thick);
-            text-decoration: none;
-            font-family: var(--font-primary);
-            font-weight: 900;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            box-shadow: var(--shadow-small);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .back-to-home:hover {
-            background: var(--accent);
-            transform: translate(-2px, -2px);
-            box-shadow: var(--shadow-brutal);
-            text-decoration: none;
-            color: var(--black);
+            max-width: 600px;
         }
 
         .sliding-container {
-    background: var(--white);
-    border: var(--border-thick);
-    box-shadow: var(--shadow-brutal);
-    position: relative;
-    overflow: hidden;
-    min-height: 600px;
-    width: 100%;        /* ✅ add this */
-    border-radius: 12px;/* optional (makes corners rounded) */
-}
-.slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;        /* ✅ add this */
-    height: 100%;
-    padding: 2rem;      /* ✅ reduce a bit from 3rem to fit */
-    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
+            background: var(--white);
+            border: var(--border-thick);
+            box-shadow: var(--shadow-brutal);
+            border-radius: 12px;
+            overflow: hidden;
+            min-height: 600px;
+            width: 100%;
+            padding: 2rem;
+        }
 
+        .slide {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
 
         .slide.active {
-            transform: translateX(0);
-        }
-
-        .slide.slide-left {
-            transform: translateX(-100%);
-        }
-
-        .slide.slide-right {
-            transform: translateX(100%);
+            display: flex;
         }
 
         .slide-header {
@@ -120,7 +117,7 @@
             margin-bottom: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            text-shadow: 2px 2px 0px var(--primary);
+            text-shadow: 3px 3px 0px var(--primary);
         }
 
         .slide-header p {
@@ -163,7 +160,6 @@
             font-size: 1.1rem;
             font-weight: 600;
             background: var(--light);
-            color: var(--dark);
             transition: all 0.3s ease;
         }
 
@@ -179,7 +175,6 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
-            margin-top: 0.5rem;
         }
 
         .role-option {
@@ -193,27 +188,15 @@
             flex-direction: column;
             align-items: center;
             gap: 0.5rem;
+            font-family: var(--font-primary);
         }
 
         .role-option:hover,
         .role-option.selected {
             border: var(--border-thick);
             background: var(--white);
-            transform: translate(-2px, -2px);
+            transform: translate(-3px, -3px);
             box-shadow: var(--shadow-small);
-        }
-
-        .role-option i {
-            font-size: 1.5rem;
-            color: var(--primary);
-        }
-
-        .role-option span {
-            font-family: var(--font-primary);
-            font-weight: 900;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            color: var(--black);
         }
 
         .btn-primary {
@@ -223,7 +206,6 @@
             text-transform: uppercase;
             border: var(--border-thick);
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -232,11 +214,12 @@
             font-size: 1rem;
             background: var(--primary);
             color: var(--white);
+            transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
             background: var(--brutal-pink);
-            transform: translate(-2px, -2px);
+            transform: translate(-3px, -3px);
             box-shadow: var(--shadow-brutal);
         }
 
@@ -261,223 +244,176 @@
             color: var(--brutal-pink);
             text-decoration: underline;
         }
-
-        @media (max-width: 768px) {
-            .auth-wrapper {
-                margin: 1rem;
-                max-width: none;
-            }
-
-            .slide {
-                padding: 2rem;
-            }
-
-            .slide-header h1 {
-                font-size: 2rem;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .role-selection {
-                grid-template-columns: 1fr;
-            }
-
-            .back-to-home {
-                top: -50px;
-                padding: 0.5rem 1rem;
-                font-size: 0.8rem;
-            }
-        }
     </style>
 </head>
 <body>
-    <div layout:fragment="content">
-        <div class="auth-wrapper">
-            <a href="/" class="back-to-home">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
-            </a>
+<div class="nav-bar">
+    <a href="/" class="back-to-home">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+    </a>
+</div>
 
-            <div class="sliding-container">
-                <!-- Login Slide -->
-                <div class="slide login-slide active">
-                    <div class="slide-header">
-                        <h1><i class="fas fa-sign-in-alt"></i> LOGIN</h1>
-                        <p>Welcome Back to QWIZZ!</p>
+<div class="auth-wrapper">
+    <div class="sliding-container">
+        <!-- Login Slide -->
+        <div class="slide login-slide active">
+            <div class="slide-header">
+                <h1><i class="fas fa-sign-in-alt"></i> LOGIN</h1>
+                <p>Welcome Back to QWIZZ!</p>
+            </div>
+
+            <form action="/login" method="post" class="auth-form">
+                <div class="form-group">
+                    <label>Choose Your Role</label>
+                    <div class="role-selection">
+                        <div class="role-option selected" onclick="selectRole('STUDENT')" id="studentRole">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Student</span>
+                        </div>
+                        <div class="role-option" onclick="selectRole('TEACHER')" id="teacherRole">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>Teacher</span>
+                        </div>
                     </div>
-
-                    <form action="/login" method="post" class="auth-form">
-                        <div class="form-group">
-                            <label>Choose Your Role</label>
-                            <div class="role-selection">
-                                <div class="role-option selected" onclick="selectRole('STUDENT')" id="studentRole">
-                                    <i class="fas fa-graduation-cap"></i>
-                                    <span>Student</span>
-                                </div>
-                                <div class="role-option" onclick="selectRole('TEACHER')" id="teacherRole">
-                                    <i class="fas fa-chalkboard-teacher"></i>
-                                    <span>Teacher</span>
-                                </div>
-                            </div>
-                            <input type="hidden" id="selectedRole" name="role" value="STUDENT">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" name="username" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" name="password" required>
-                        </div>
-
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-rocket"></i>
-                            Login to QWIZZ
-                        </button>
-                    </form>
-
-                    <div class="slide-footer">
-                        <p>Don't have an account? 
-                            <a onclick="showRegisterSlide()">Create Account</a>
-                        </p>
-                    </div>
+                    <input type="hidden" id="selectedRole" name="role" value="STUDENT">
                 </div>
 
-                <!-- Register Slide -->
-                <div class="slide register-slide slide-right">
-                    <div class="slide-header">
-                        <h1><i class="fas fa-user-plus"></i> REGISTER</h1>
-                        <p>Join the QWIZZ Community!</p>
-                    </div>
-
-                    <form action="/register" method="post" class="auth-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="firstName">First Name</label>
-                                <input type="text" id="firstName" name="firstName" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="lastName">Last Name</label>
-                                <input type="text" id="lastName" name="lastName" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="regUsername">Username</label>
-                            <input type="text" id="regUsername" name="username" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="regPassword">Password</label>
-                                <input type="password" id="regPassword" name="password" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="confirmPassword">Confirm Password</label>
-                                <input type="password" id="confirmPassword" name="confirmPassword" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Choose Your Role</label>
-                            <div class="role-selection">
-                                <div class="role-option selected" onclick="selectRegRole('STUDENT')" id="regStudentRole">
-                                    <i class="fas fa-graduation-cap"></i>
-                                    <span>Student</span>
-                                </div>
-                                <div class="role-option" onclick="selectRegRole('TEACHER')" id="regTeacherRole">
-                                    <i class="fas fa-chalkboard-teacher"></i>
-                                    <span>Teacher</span>
-                                </div>
-                            </div>
-                            <input type="hidden" id="selectedRegRole" name="role" value="STUDENT">
-                        </div>
-
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-rocket"></i>
-                            Create Account
-                        </button>
-                    </form>
-
-                    <div class="slide-footer">
-                        <p>Already have an account? 
-                            <a onclick="showLoginSlide()">Sign In</a>
-                        </p>
-                    </div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
                 </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Login to QWIZZ
+                </button>
+            </form>
+
+            <div class="slide-footer">
+                <p>Don't have an account?
+                    <a onclick="showRegisterSlide()">Create Account</a>
+                </p>
             </div>
         </div>
 
-        <script>
-            function selectRole(role) {
-                document.querySelectorAll('#studentRole, #teacherRole').forEach(option => {
-                    option.classList.remove('selected');
-                });
-                
-                if (role === 'STUDENT') {
-                    document.getElementById('studentRole').classList.add('selected');
-                } else {
-                    document.getElementById('teacherRole').classList.add('selected');
-                }
-                
-                document.getElementById('selectedRole').value = role;
-            }
+        <!-- Register Slide -->
+        <div class="slide register-slide">
+            <div class="slide-header">
+                <h1><i class="fas fa-user-plus"></i> REGISTER</h1>
+                <p>Join the QWIZZ Community!</p>
+            </div>
 
-            function selectRegRole(role) {
-                document.querySelectorAll('#regStudentRole, #regTeacherRole').forEach(option => {
-                    option.classList.remove('selected');
-                });
-                
-                if (role === 'STUDENT') {
-                    document.getElementById('regStudentRole').classList.add('selected');
-                } else {
-                    document.getElementById('regTeacherRole').classList.add('selected');
-                }
-                
-                document.getElementById('selectedRegRole').value = role;
-            }
+            <form action="/register" method="post" class="auth-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                </div>
 
-            function showRegisterSlide() {
-                const loginSlide = document.querySelector('.login-slide');
-                const registerSlide = document.querySelector('.register-slide');
-                
-                loginSlide.classList.remove('active');
-                loginSlide.classList.add('slide-left');
-                
-                registerSlide.classList.remove('slide-right');
-                registerSlide.classList.add('active');
-            }
+                <div class="form-group">
+                    <label for="regUsername">Username</label>
+                    <input type="text" id="regUsername" name="username" required>
+                </div>
 
-            function showLoginSlide() {
-                const loginSlide = document.querySelector('.login-slide');
-                const registerSlide = document.querySelector('.register-slide');
-                
-                registerSlide.classList.remove('active');
-                registerSlide.classList.add('slide-right');
-                
-                loginSlide.classList.remove('slide-left');
-                loginSlide.classList.add('active');
-            }
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
 
-            document.addEventListener('DOMContentLoaded', function() {
-                selectRole('STUDENT');
-                selectRegRole('STUDENT');
-                
-                // Check if URL contains #register to show register slide
-                if (window.location.hash === '#register') {
-                    showRegisterSlide();
-                }
-            });
-        </script>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Choose Your Role</label>
+                    <div class="role-selection">
+                        <div class="role-option selected" onclick="selectRegRole('STUDENT')" id="regStudentRole">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Student</span>
+                        </div>
+                        <div class="role-option" onclick="selectRegRole('TEACHER')" id="regTeacherRole">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>Teacher</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedRegRole" name="role" value="STUDENT">
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Create Account
+                </button>
+            </form>
+
+            <div class="slide-footer">
+                <p>Already have an account?
+                    <a onclick="showLoginSlide()">Sign In</a>
+                </p>
+            </div>
+        </div>
     </div>
+</div>
+
+<script>
+    function selectRole(role) {
+        document.querySelectorAll('#studentRole, #teacherRole').forEach(option => {
+            option.classList.remove('selected');
+        });
+        if (role === 'STUDENT') {
+            document.getElementById('studentRole').classList.add('selected');
+        } else {
+            document.getElementById('teacherRole').classList.add('selected');
+        }
+        document.getElementById('selectedRole').value = role;
+    }
+
+    function selectRegRole(role) {
+        document.querySelectorAll('#regStudentRole, #regTeacherRole').forEach(option => {
+            option.classList.remove('selected');
+        });
+        if (role === 'STUDENT') {
+            document.getElementById('regStudentRole').classList.add('selected');
+        } else {
+            document.getElementById('regTeacherRole').classList.add('selected');
+        }
+        document.getElementById('selectedRegRole').value = role;
+    }
+
+    function showRegisterSlide() {
+        document.querySelector('.login-slide').classList.remove('active');
+        document.querySelector('.register-slide').classList.add('active');
+    }
+
+    function showLoginSlide() {
+        document.querySelector('.register-slide').classList.remove('active');
+        document.querySelector('.login-slide').classList.add('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        selectRole('STUDENT');
+        selectRegRole('STUDENT');
+        if (window.location.hash === '#register') {
+            showRegisterSlide();
+        }
+    });
+</script>
 </body>
 </html>
