@@ -367,29 +367,4 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/forgot-password")
-    public String forgotPasswordPage(Model model) {
-        model.addAttribute("pageTitle", "Forgot Password - QWIZZ");
-        return "auth/forgot-password";
-    }
-
-    @PostMapping("/forgot-password")
-    public String forgotPassword(@RequestParam String email,
-                                RedirectAttributes redirectAttributes) {
-        try {
-            Optional<User> userOpt = userService.findByEmail(email);
-            if (userOpt.isPresent()) {
-                // In a real application, you would send a password reset email
-                redirectAttributes.addFlashAttribute("successMessage",
-                    "If an account with that email exists, a password reset link has been sent.");
-            } else {
-                redirectAttributes.addFlashAttribute("successMessage",
-                    "If an account with that email exists, a password reset link has been sent.");
-            }
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "An error occurred. Please try again.");
-        }
-
-        return "redirect:/forgot-password";
-    }
 }

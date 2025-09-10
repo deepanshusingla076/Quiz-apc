@@ -17,9 +17,6 @@ import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
 
-/**
- * Student-specific controller for quiz taking and result viewing
- */
 @Controller
 @RequestMapping("/student")
 public class StudentController {
@@ -33,16 +30,18 @@ public class StudentController {
     @Autowired
     private UserService userService;
 
-    // Check if user is logged in and is a student
-    private boolean isStudent(HttpSession session) {
-        Boolean isLoggedIn = (Boolean) session.getAttribute("isLoggedIn");
-        String userRole = (String) session.getAttribute("userRole");
-        return isLoggedIn != null && isLoggedIn && "STUDENT".equals(userRole);
+    private User getCurrentUser(HttpSession session) {
+        User sessionUser = (User) session.getAttribute("user");
+        if (sessionUser != null && sessionUser.getRole() == Role.STUDENT) {
+            return sessionUser;
+        }
+        return null;
     }
 
     @GetMapping("/quiz/{id}")
     public String viewQuizDetails(@PathVariable Long id, Model model, HttpSession session) {
-        if (!isStudent(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
@@ -55,8 +54,7 @@ public class StudentController {
         List<Question> questions = quizService.getQuestionsByQuizId(id);
         
         // Check if student has already attempted this quiz
-        Long userId = (Long) session.getAttribute("userId");
-        List<QuizAttempt> previousAttempts = quizAttemptService.getAttemptsByUserAndQuiz(userId, id);
+        List<QuizAttempt> previousAttempts = quizAttemptService.getAttemptsByUserAndQuiz(currentUser.getId(), id);
 
         model.addAttribute("quiz", quiz);
         model.addAttribute("questionCount", questions.size());
@@ -68,7 +66,8 @@ public class StudentController {
 
     @GetMapping("/quiz/{id}/start")
     public String startQuiz(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
-        if (!isStudent(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
@@ -83,13 +82,11 @@ public class StudentController {
             redirectAttributes.addFlashAttribute("errorMessage", "This quiz is not currently available");
             return "redirect:/dashboard";
         }
-
-        Long userId = (Long) session.getAttribute("userId");
         
         try {
             // Create a new quiz attempt
             QuizAttempt attempt = new QuizAttempt();
-            attempt.setUserId(userId);
+            attempt.setUserId(currentUser.getId());
             attempt.setQuizId(id);
             attempt.setStartTime(LocalDateTime.now());
             attempt.setCompleted(false);
@@ -109,11 +106,10 @@ public class StudentController {
                           @PathVariable Long attemptId, 
                           Model model, 
                           HttpSession session) {
-        if (!isStudent(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
-
-        Long userId = (Long) session.getAttribute("userId");
         
         Optional<QuizAttempt> attemptOpt = quizAttemptService.findById(attemptId);
         if (attemptOpt.isEmpty()) {
@@ -123,7 +119,7 @@ public class StudentController {
         QuizAttempt attempt = attemptOpt.get();
         
         // Verify that this attempt belongs to the current user
-        if (!attempt.getUserId().equals(userId) || !attempt.getQuizId().equals(quizId)) {
+        if (!attempt.getUserId().equals(currentUser.getId()) || !attempt.getQuizId().equals(quizId)) {
             return "redirect:/dashboard";
         }
 
@@ -154,11 +150,10 @@ public class StudentController {
                             @RequestParam Map<String, String> answers,
                             HttpSession session,
                             RedirectAttributes redirectAttributes) {
-        if (!isStudent(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
-
-        Long userId = (Long) session.getAttribute("userId");
         
         Optional<QuizAttempt> attemptOpt = quizAttemptService.findById(attemptId);
         if (attemptOpt.isEmpty()) {
@@ -168,7 +163,7 @@ public class StudentController {
         QuizAttempt attempt = attemptOpt.get();
         
         // Verify that this attempt belongs to the current user
-        if (!attempt.getUserId().equals(userId) || !attempt.getQuizId().equals(quizId)) {
+        if (!attempt.getUserId().equals(currentUser.getId()) || !attempt.getQuizId().equals(quizId)) {
             return "redirect:/dashboard";
         }
 
@@ -225,11 +220,10 @@ public class StudentController {
                                 @PathVariable Long attemptId,
                                 Model model,
                                 HttpSession session) {
-        if (!isStudent(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
-
-        Long userId = (Long) session.getAttribute("userId");
         
         Optional<QuizAttempt> attemptOpt = quizAttemptService.findById(attemptId);
         if (attemptOpt.isEmpty()) {
@@ -239,7 +233,7 @@ public class StudentController {
         QuizAttempt attempt = attemptOpt.get();
         
         // Verify that this attempt belongs to the current user
-        if (!attempt.getUserId().equals(userId) || !attempt.getQuizId().equals(quizId)) {
+        if (!attempt.getUserId().equals(currentUser.getId()) || !attempt.getQuizId().equals(quizId)) {
             return "redirect:/dashboard";
         }
 
@@ -261,13 +255,12 @@ public class StudentController {
 
     @GetMapping("/progress")
     public String viewProgress(Model model, HttpSession session) {
-        if (!isStudent(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
-
-        Long userId = (Long) session.getAttribute("userId");
         
-        List<QuizAttempt> attempts = quizAttemptService.getAttemptsByUser(userId);
+        List<QuizAttempt> attempts = quizAttemptService.getAttemptsByUser(currentUser.getId());
         
         // Calculate statistics
         long completedQuizzes = attempts.stream().filter(QuizAttempt::isCompleted).count();
@@ -287,7 +280,8 @@ public class StudentController {
 
     @GetMapping("/leaderboard")
     public String viewLeaderboard(Model model, HttpSession session) {
-        if (!isStudent(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 

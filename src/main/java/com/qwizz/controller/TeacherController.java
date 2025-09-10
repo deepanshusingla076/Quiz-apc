@@ -32,16 +32,23 @@ public class TeacherController {
     @Autowired
     private UserService userService;
 
-    // Check if user is logged in and is a teacher
-    private boolean isTeacher(HttpSession session) {
+    // Get current logged-in user from session
+    private User getCurrentUser(HttpSession session) {
         Boolean isLoggedIn = (Boolean) session.getAttribute("isLoggedIn");
         String userRole = (String) session.getAttribute("userRole");
-        return isLoggedIn != null && isLoggedIn && "TEACHER".equals(userRole);
+        Long userId = (Long) session.getAttribute("userId");
+        
+        if (isLoggedIn != null && isLoggedIn && "TEACHER".equals(userRole) && userId != null) {
+            Optional<User> userOpt = userService.findById(userId);
+            return userOpt.orElse(null);
+        }
+        return null;
     }
 
     @GetMapping("/quiz/create")
     public String createQuizPage(Model model, HttpSession session) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
@@ -55,13 +62,13 @@ public class TeacherController {
     public String createQuiz(@ModelAttribute Quiz quiz,
                             HttpSession session,
                             RedirectAttributes redirectAttributes) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
         try {
-            Long userId = (Long) session.getAttribute("userId");
-            quiz.setCreatorId(userId);
+            quiz.setCreatorId(currentUser.getId());
             quiz.setCreatedAt(LocalDateTime.now());
             quiz.setUpdatedAt(LocalDateTime.now());
             quiz.setActive(true);
@@ -78,11 +85,11 @@ public class TeacherController {
 
     @GetMapping("/quiz/{id}/edit")
     public String editQuizPage(@PathVariable Long id, Model model, HttpSession session) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
-        Long userId = (Long) session.getAttribute("userId");
         
         Optional<Quiz> quizOpt = quizService.findById(id);
         if (quizOpt.isEmpty()) {
@@ -92,7 +99,7 @@ public class TeacherController {
         Quiz quiz = quizOpt.get();
         
         // Check if teacher owns this quiz
-        if (!quiz.getCreatorId().equals(userId)) {
+        if (!quiz.getCreatorId().equals(currentUser.getId())) {
             return "redirect:/teacher/quizzes";
         }
 
@@ -113,11 +120,11 @@ public class TeacherController {
                             @ModelAttribute Quiz quiz,
                             HttpSession session,
                             RedirectAttributes redirectAttributes) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
-        Long userId = (Long) session.getAttribute("userId");
         
         Optional<Quiz> existingQuizOpt = quizService.findById(id);
         if (existingQuizOpt.isEmpty()) {
@@ -127,13 +134,13 @@ public class TeacherController {
         Quiz existingQuiz = existingQuizOpt.get();
         
         // Check if teacher owns this quiz
-        if (!existingQuiz.getCreatorId().equals(userId)) {
+        if (!existingQuiz.getCreatorId().equals(currentUser.getId())) {
             return "redirect:/teacher/quizzes";
         }
 
         try {
             quiz.setId(id);
-            quiz.setCreatorId(userId);
+            quiz.setCreatorId(currentUser.getId());
             quiz.setCreatedAt(existingQuiz.getCreatedAt());
             quiz.setUpdatedAt(LocalDateTime.now());
             
@@ -156,11 +163,11 @@ public class TeacherController {
                              @RequestParam(required = false) String option4,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
-        Long userId = (Long) session.getAttribute("userId");
         
         Optional<Quiz> quizOpt = quizService.findById(id);
         if (quizOpt.isEmpty()) {
@@ -170,7 +177,7 @@ public class TeacherController {
         Quiz quiz = quizOpt.get();
         
         // Check if teacher owns this quiz
-        if (!quiz.getCreatorId().equals(userId)) {
+        if (!quiz.getCreatorId().equals(currentUser.getId())) {
             return "redirect:/teacher/quizzes";
         }
 
@@ -201,11 +208,11 @@ public class TeacherController {
                                 @PathVariable Long questionId,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
-        Long userId = (Long) session.getAttribute("userId");
         
         Optional<Quiz> quizOpt = quizService.findById(quizId);
         if (quizOpt.isEmpty()) {
@@ -215,7 +222,7 @@ public class TeacherController {
         Quiz quiz = quizOpt.get();
         
         // Check if teacher owns this quiz
-        if (!quiz.getCreatorId().equals(userId)) {
+        if (!quiz.getCreatorId().equals(currentUser.getId())) {
             return "redirect:/teacher/quizzes";
         }
 
@@ -231,11 +238,11 @@ public class TeacherController {
 
     @GetMapping("/quiz/{id}/preview")
     public String previewQuiz(@PathVariable Long id, Model model, HttpSession session) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
-        Long userId = (Long) session.getAttribute("userId");
         
         Optional<Quiz> quizOpt = quizService.findById(id);
         if (quizOpt.isEmpty()) {
@@ -245,7 +252,7 @@ public class TeacherController {
         Quiz quiz = quizOpt.get();
         
         // Check if teacher owns this quiz
-        if (!quiz.getCreatorId().equals(userId)) {
+        if (!quiz.getCreatorId().equals(currentUser.getId())) {
             return "redirect:/teacher/quizzes";
         }
 
@@ -260,11 +267,11 @@ public class TeacherController {
 
     @GetMapping("/quiz/{id}/results")
     public String quizResults(@PathVariable Long id, Model model, HttpSession session) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
-        Long userId = (Long) session.getAttribute("userId");
         
         Optional<Quiz> quizOpt = quizService.findById(id);
         if (quizOpt.isEmpty()) {
@@ -274,7 +281,7 @@ public class TeacherController {
         Quiz quiz = quizOpt.get();
         
         // Check if teacher owns this quiz
-        if (!quiz.getCreatorId().equals(userId)) {
+        if (!quiz.getCreatorId().equals(currentUser.getId())) {
             return "redirect:/teacher/quizzes";
         }
 
@@ -289,12 +296,12 @@ public class TeacherController {
 
     @GetMapping("/quizzes")
     public String manageQuizzes(Model model, HttpSession session) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
-        Long userId = (Long) session.getAttribute("userId");
-        List<Quiz> quizzes = quizService.getQuizzesByCreator(userId);
+        List<Quiz> quizzes = quizService.getQuizzesByCreator(currentUser.getId());
 
         model.addAttribute("quizzes", quizzes);
         model.addAttribute("pageTitle", "Manage Quizzes - QWIZZ");
@@ -306,11 +313,11 @@ public class TeacherController {
     public String deleteQuiz(@PathVariable Long id,
                             HttpSession session,
                             RedirectAttributes redirectAttributes) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
-        Long userId = (Long) session.getAttribute("userId");
         
         Optional<Quiz> quizOpt = quizService.findById(id);
         if (quizOpt.isEmpty()) {
@@ -320,7 +327,7 @@ public class TeacherController {
         Quiz quiz = quizOpt.get();
         
         // Check if teacher owns this quiz
-        if (!quiz.getCreatorId().equals(userId)) {
+        if (!quiz.getCreatorId().equals(currentUser.getId())) {
             redirectAttributes.addFlashAttribute("errorMessage", "You don't have permission to delete this quiz");
             return "redirect:/teacher/quizzes";
         }
@@ -338,7 +345,8 @@ public class TeacherController {
 
     @GetMapping("/students")
     public String viewStudents(Model model, HttpSession session) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
@@ -351,14 +359,14 @@ public class TeacherController {
 
     @GetMapping("/analytics")
     public String analytics(Model model, HttpSession session) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
-        Long userId = (Long) session.getAttribute("userId");
         
         // Get analytics data
-        List<Quiz> teacherQuizzes = quizService.getQuizzesByCreator(userId);
+        List<Quiz> teacherQuizzes = quizService.getQuizzesByCreator(currentUser.getId());
         List<QuizAttempt> allAttempts = new ArrayList<>();
         
         for (Quiz quiz : teacherQuizzes) {
@@ -386,7 +394,8 @@ public class TeacherController {
 
     @GetMapping("/quiz/import")
     public String importQuiz(Model model, HttpSession session) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
@@ -396,7 +405,8 @@ public class TeacherController {
 
     @GetMapping("/reports/generate")
     public String generateReports(Model model, HttpSession session) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
@@ -406,17 +416,12 @@ public class TeacherController {
 
     @GetMapping("/settings")
     public String settings(Model model, HttpSession session) {
-        if (!isTeacher(session)) {
+        User currentUser = getCurrentUser(session);
+        if (currentUser == null) {
             return "redirect:/login";
         }
 
-        Long userId = (Long) session.getAttribute("userId");
-        Optional<User> userOpt = userService.findById(userId);
-        
-        if (userOpt.isPresent()) {
-            model.addAttribute("user", userOpt.get());
-        }
-
+        model.addAttribute("user", currentUser);
         model.addAttribute("pageTitle", "Settings - QWIZZ");
         return "teacher/settings";
     }

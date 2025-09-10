@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -49,25 +50,27 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(authz -> authz
                 // Public endpoints
                 .requestMatchers("/", "/home", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/jwt/**").permitAll()
                 .requestMatchers("/api/check-username", "/api/check-email").permitAll()
-                .requestMatchers("/forgot-password").permitAll()
                 
                 // Dashboard endpoints (authenticated users)
                 .requestMatchers("/dashboard").authenticated()
-                .requestMatchers("/quiz/**").authenticated()
-                .requestMatchers("/api/quiz/**").authenticated()
                 
                 // Teacher endpoints
                 .requestMatchers("/teacher/**").hasRole("TEACHER")
+                .requestMatchers("/api/teacher/**").hasRole("TEACHER")
                 
                 // Student endpoints  
                 .requestMatchers("/student/**").hasRole("STUDENT")
+                .requestMatchers("/api/student/**").hasRole("STUDENT")
+                
+                // Quiz endpoints (authenticated users)
+                .requestMatchers("/quiz/**").authenticated()
+                .requestMatchers("/api/quiz/**").authenticated()
                 
                 // All other requests require authentication
                 .anyRequest().authenticated()
@@ -81,12 +84,28 @@ public class SecurityConfig {
             )
             .exceptionHandling(exceptions -> exceptions
                 .authenticationEntryPoint((request, response, authException) -> {
-                    // Redirect to login page for unauthenticated users
-                    response.sendRedirect("/login");
+                    String requestURI = request.getRequestURI();
+                    // For API requests, return JSON error
+                    if (requestURI.startsWith("/api/")) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"Authentication required\"}");
+                    } else {
+                        // For web requests, redirect to login
+                        response.sendRedirect("/login");
+                    }
                 })
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
-                    // Redirect to 403 page for access denied
-                    response.sendRedirect("/error/403");
+                    String requestURI = request.getRequestURI();
+                    // For API requests, return JSON error
+                    if (requestURI.startsWith("/api/")) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\":\"Access Denied\",\"message\":\"Insufficient permissions\"}");
+                    } else {
+                        // For web requests, redirect to 403 page
+                        response.sendRedirect("/error/403");
+                    }
                 })
             )
             .authenticationProvider(authenticationProvider())
