@@ -262,12 +262,19 @@ public class DatabaseInitializer {
                         
                         // Simulate completion
                         int totalQuestions = attempt.getTotalQuestions();
+                        
+                        // Skip if quiz has no questions to avoid NaN values
+                        if (totalQuestions == 0) {
+                            continue;
+                        }
+                        
                         int correctAnswers = (int) (totalQuestions * (0.4 + random.nextDouble() * 0.6)); // 40-100% correct
                         int score = correctAnswers * 10; // 10 points per correct answer
+                        double percentage = (double) correctAnswers / totalQuestions * 100;
                         
                         attempt.setCorrectAnswers(correctAnswers);
                         attempt.setScore(score);
-                        attempt.setPercentage((double) correctAnswers / totalQuestions * 100);
+                        attempt.setPercentage(percentage);
                         attempt.setTimeTaken(random.nextInt(1800) + 300); // 5-35 minutes
                         attempt.setTotalPoints((double) totalQuestions * 10);
                         
@@ -280,7 +287,7 @@ public class DatabaseInitializer {
                         quizAttemptService.submitQuizAttempt(attempt.getId(), correctAnswers, score);
                         
                         // Update quiz statistics
-                        quizService.updateQuizStatistics(randomQuiz, attempt.getPercentage());
+                        quizService.updateQuizStatistics(randomQuiz, percentage);
                     } catch (Exception e) {
                         // Skip this attempt if there's an error
                         System.err.println("Error creating quiz attempt: " + e.getMessage());

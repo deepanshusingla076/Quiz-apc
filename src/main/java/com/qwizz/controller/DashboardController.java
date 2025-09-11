@@ -91,11 +91,11 @@ public class DashboardController {
         // Calculate accurate statistics
         int totalQuizzesTaken = completedAttempts.size();
         double averageScore = completedAttempts.stream()
-                .mapToDouble(QuizAttempt::getPercentage)
+                .mapToDouble(attempt -> attempt.getPercentage() != null ? attempt.getPercentage() : 0.0)
                 .average()
                 .orElse(0.0);
         int totalPoints = (int) completedAttempts.stream()
-                .mapToDouble(attempt -> attempt.getPercentage() * 10) // 10 points per percent
+                .mapToDouble(attempt -> (attempt.getPercentage() != null ? attempt.getPercentage() : 0.0) * 10) // 10 points per percent
                 .sum();
         
         // Quiz streak calculation
@@ -172,7 +172,7 @@ public class DashboardController {
         int totalStudentAttempts = allAttemptsOnMyQuizzes.size();
         double averageQuizScore = allAttemptsOnMyQuizzes.stream()
                 .filter(QuizAttempt::isCompleted)
-                .mapToDouble(QuizAttempt::getPercentage)
+                .mapToDouble(attempt -> attempt.getPercentage() != null ? attempt.getPercentage() : 0.0)
                 .average()
                 .orElse(0.0);
         
@@ -223,7 +223,8 @@ public class DashboardController {
         int streak = 0;
         
         for (QuizAttempt attempt : attempts) {
-            if (attempt.getPercentage() >= 70.0) { // Consider 70% as passing
+            Double percentage = attempt.getPercentage();
+            if (percentage != null && percentage >= 70.0) { // Consider 70% as passing
                 streak++;
             } else {
                 break;
@@ -289,7 +290,7 @@ public class DashboardController {
         long totalCompleted = attempts.stream().filter(QuizAttempt::isCompleted).count();
         long passed = attempts.stream()
                 .filter(QuizAttempt::isCompleted)
-                .filter(attempt -> attempt.getPercentage() >= 70.0)
+                .filter(attempt -> attempt.getPercentage() != null && attempt.getPercentage() >= 70.0)
                 .count();
         
         if (totalCompleted == 0) return "No data";

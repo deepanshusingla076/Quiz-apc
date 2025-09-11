@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Analytics - QWIZZ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .analytics-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quiz-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .quiz-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .quiz-info h4 {
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .quiz-info p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .quiz-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .quiz-stat {
+            text-align: center;
+        }
+
+        .quiz-stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .quiz-stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .recent-attempts {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .attempt-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .attempt-item:last-child {
+            border-bottom: none;
+        }
+
+        .attempt-user {
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .attempt-quiz {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .attempt-score {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .score-high {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+        }
+
+        .score-medium {
+            background: rgba(237, 137, 54, 0.1);
+            color: #dd6b20;
+        }
+
+        .score-low {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f7fafc;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #cbd5e0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .quiz-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .quiz-stats {
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .attempt-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="margin-bottom: 20px;">
+            <a href="/dashboard?role=teacher" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div class="header">
+            <h1><i class="fas fa-chart-bar"></i> Analytics Dashboard</h1>
+            <p>Comprehensive insights into your quiz performance and student engagement</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="stat-value" th:text="${totalQuizzes}">0</div>
+                <div class="stat-label">Total Quizzes</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value" th:text="${totalAttempts}">0</div>
+                <div class="stat-label">Total Attempts</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-value" th:text="${averageScore + '%'}">0%</div>
+                <div class="stat-label">Average Score</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stat-value">A+</div>
+                <div class="stat-label">Performance Grade</div>
+            </div>
+        </div>
+
+        <div class="analytics-section">
+            <h2 class="section-title">
+                <i class="fas fa-clipboard-list"></i>
+                Quiz Performance
+            </h2>
+            
+            <div th:if="${#lists.isEmpty(teacherQuizzes)}" class="empty-state">
+                <i class="fas fa-clipboard-list"></i>
+                <h3>No Quizzes Created Yet</h3>
+                <p>Create your first quiz to see detailed analytics</p>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(teacherQuizzes)}" class="quiz-list">
+                <div th:each="quiz : ${teacherQuizzes}" class="quiz-item">
+                    <div class="quiz-info">
+                        <h4 th:text="${quiz.title}">Quiz Title</h4>
+                        <p th:text="${quiz.description}">Quiz Description</p>
+                    </div>
+                    <div class="quiz-stats">
+                        <div class="quiz-stat">
+                            <div class="quiz-stat-value" th:text="${quiz.totalAttempts ?: 0}">0</div>
+                            <div class="quiz-stat-label">Attempts</div>
+                        </div>
+                        <div class="quiz-stat">
+                            <div class="quiz-stat-value" th:text="${quiz.averageScore != null ? #numbers.formatDecimal(quiz.averageScore, 1, 1) + '%' : '0%'}">0%</div>
+                            <div class="quiz-stat-label">Avg Score</div>
+                        </div>
+                        <div class="quiz-stat">
+                            <div class="quiz-stat-value" th:text="${quiz.difficulty?.name() ?: 'N/A'}">Easy</div>
+                            <div class="quiz-stat-label">Difficulty</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analytics-section">
+            <h2 class="section-title">
+                <i class="fas fa-clock"></i>
+                Recent Activity
+            </h2>
+            
+            <div th:if="${#lists.isEmpty(recentAttempts)}" class="empty-state">
+                <i class="fas fa-clock"></i>
+                <h3>No Recent Activity</h3>
+                <p>Student attempts on your quizzes will appear here</p>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(recentAttempts)}" class="recent-attempts">
+                <div th:each="attempt : ${recentAttempts}" class="attempt-item">
+                    <div>
+                        <div class="attempt-user" th:text="${attempt.user?.firstName + ' ' + attempt.user?.lastName ?: 'Anonymous'}">Student Name</div>
+                        <div class="attempt-quiz" th:text="${attempt.quiz?.title ?: 'Quiz'}">Quiz Title</div>
+                    </div>
+                    <div class="attempt-score" 
+                         th:classappend="${attempt.percentage != null && attempt.percentage >= 80} ? 'score-high' : (${attempt.percentage != null && attempt.percentage >= 60} ? 'score-medium' : 'score-low')"
+                         th:text="${attempt.percentage != null ? #numbers.formatDecimal(attempt.percentage, 1, 1) + '%' : 'N/A'}">0%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

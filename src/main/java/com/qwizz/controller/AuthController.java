@@ -80,8 +80,11 @@ public class AuthController {
             jwtCookie.setSecure(false);
             response.addCookie(jwtCookie);
 
-            // Also set session for controllers that read from session
+            // Also set session attributes for controllers that read from session
             session.setAttribute("user", user);
+            session.setAttribute("isLoggedIn", true);
+            session.setAttribute("userRole", user.getRole().toString());
+            session.setAttribute("userId", user.getId());
 
             redirectAttributes.addFlashAttribute("successMessage",
                 "Welcome back, " + user.getFirstName() + "!");
@@ -174,6 +177,9 @@ public class AuthController {
             response.addCookie(jwtCookie);
 
             session.setAttribute("user", authedUser);
+            session.setAttribute("isLoggedIn", true);
+            session.setAttribute("userRole", authedUser.getRole().toString());
+            session.setAttribute("userId", authedUser.getId());
 
             // Redirect to dashboard (controller will route by role)
             return "redirect:/dashboard";
@@ -262,13 +268,16 @@ public class AuthController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletResponse response, RedirectAttributes redirectAttributes) {
+    public String logout(HttpServletResponse response, RedirectAttributes redirectAttributes, jakarta.servlet.http.HttpSession session) {
         // Clear JWT cookie
         Cookie jwtCookie = new Cookie("jwt-token", null);
         jwtCookie.setHttpOnly(true);
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(0);
         response.addCookie(jwtCookie);
+
+        // Clear session
+        session.invalidate();
 
         redirectAttributes.addFlashAttribute("successMessage", "You have been logged out successfully");
         return "redirect:/";

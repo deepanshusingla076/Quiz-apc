@@ -378,7 +378,7 @@ public class TeacherController {
         int totalAttempts = allAttempts.size();
         double averageScore = allAttempts.stream()
                 .filter(QuizAttempt::isCompleted)
-                .mapToDouble(QuizAttempt::getPercentage)
+                .mapToDouble(attempt -> attempt.getPercentage() != null ? attempt.getPercentage() : 0.0)
                 .average()
                 .orElse(0.0);
 

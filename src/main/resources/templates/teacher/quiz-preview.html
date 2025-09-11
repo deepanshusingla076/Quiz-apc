@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Preview Quiz - QWIZZ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .quiz-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .question-points {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options-list {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .option-item {
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-item.correct {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.05);
+        }
+
+        .option-letter {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .option-item.correct .option-letter {
+            background: #48bb78;
+            color: white;
+        }
+
+        .correct-answer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #2f855a;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .question-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f7fafc;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e0;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .quiz-meta {
+                gap: 15px;
+            }
+
+            .question-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+
+            .actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${quiz.title}">Quiz Title</h1>
+            <p th:text="${quiz.description}">Quiz Description</p>
+            
+            <div class="quiz-meta">
+                <div class="meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span th:text="${quiz.timeLimit + ' minutes'}">30 minutes</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-signal"></i>
+                    <span th:text="${quiz.difficulty?.name()}">Medium</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span th:text="${#lists.size(questions)} + ' questions'">5 questions</span>
+                </div>
+                <div class="meta-item" th:if="${quiz.isPublic}">
+                    <i class="fas fa-globe"></i>
+                    <span>Public</span>
+                </div>
+                <div class="meta-item" th:unless="${quiz.isPublic}">
+                    <i class="fas fa-lock"></i>
+                    <span>Private</span>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(questions)}" class="empty-state">
+            <i class="fas fa-question-circle"></i>
+            <h3>No Questions Added</h3>
+            <p>This quiz doesn't have any questions yet. Add some questions to make it available for students.</p>
+            <a th:href="@{/teacher/quiz/{id}/edit(id=${quiz.id})}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Questions
+            </a>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(questions)}">
+            <div th:each="question, iterStat : ${questions}" class="question-card">
+                <div class="question-header">
+                    <div class="question-number" th:text="${iterStat.count}">1</div>
+                    <div class="question-points" th:text="${question.points + ' points'}">10 points</div>
+                </div>
+
+                <div class="question-type" th:text="${question.questionType?.name()?.replace('_', ' ')}">Multiple Choice</div>
+                
+                <div class="question-text" th:text="${question.questionText}">What is the capital of France?</div>
+
+                <div th:if="${question.questionType?.name() == 'MULTIPLE_CHOICE'}">
+                    <ul class="options-list">
+                        <li th:each="option, optStat : ${question.optionsList}" 
+                            class="option-item"
+                            th:classappend="${option == question.correctAnswer} ? 'correct' : ''">
+                            <div class="option-letter" th:text="${T(java.lang.Character).toString(65 + optStat.index)}">A</div>
+                            <span th:text="${option}">Option text</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div th:if="${question.questionType?.name() == 'TRUE_FALSE'}">
+                    <ul class="options-list">
+                        <li class="option-item" th:classappend="${question.correctAnswer == 'True'} ? 'correct' : ''">
+                            <div class="option-letter">A</div>
+                            <span>True</span>
+                        </li>
+                        <li class="option-item" th:classappend="${question.correctAnswer == 'False'} ? 'correct' : ''">
+                            <div class="option-letter">B</div>
+                            <span>False</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="correct-answer">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Correct Answer: <strong th:text="${question.correctAnswer}">Paris</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a th:href="@{/teacher/quiz/{id}/edit(id=${quiz.id})}" class="btn btn-secondary">
+                <i class="fas fa-edit"></i> Edit Quiz
+            </a>
+            <a href="/teacher/quizzes" class="btn btn-secondary">
+                <i class="fas fa-list"></i> Back to Quizzes
+            </a>
+        </div>
+    </div>
+</body>
+</html>

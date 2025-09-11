@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Students - QWIZZ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .students-table {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: rgba(102, 126, 234, 0.1);
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .student-details h4 {
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .student-details p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .stats-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .stats-high {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+        }
+
+        .stats-medium {
+            background: rgba(237, 137, 54, 0.1);
+            color: #dd6b20;
+        }
+
+        .stats-low {
+            background: rgba(160, 174, 192, 0.1);
+            color: #718096;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f7fafc;
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e0;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #718096;
+        }
+
+        .back-btn {
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .students-table {
+                padding: 20px;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 10px 8px;
+            }
+
+            .student-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .student-avatar {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back-btn">
+            <a href="/dashboard?role=teacher" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div class="header">
+            <h1><i class="fas fa-users"></i> Students</h1>
+            <p>View and manage student information and performance</p>
+        </div>
+
+        <div th:if="${#lists.isEmpty(students)}" class="empty-state">
+            <i class="fas fa-users"></i>
+            <h3>No Students Found</h3>
+            <p>There are currently no students registered in the system.</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(students)}" class="students-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Email</th>
+                        <th>Total Points</th>
+                        <th>Quizzes Taken</th>
+                        <th>Average Score</th>
+                        <th>Quiz Streak</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="student : ${students}">
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar" th:text="${#strings.substring(student.firstName, 0, 1) + #strings.substring(student.lastName, 0, 1)}">AB</div>
+                                <div class="student-details">
+                                    <h4 th:text="${student.firstName + ' ' + student.lastName}">Student Name</h4>
+                                    <p th:text="${student.username}">@username</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td th:text="${student.email}">student@email.com</td>
+                        <td>
+                            <span class="stats-badge" 
+                                  th:classappend="${student.totalPoints > 1000} ? 'stats-high' : (${student.totalPoints > 500} ? 'stats-medium' : 'stats-low')"
+                                  th:text="${student.totalPoints ?: 0}">0</span>
+                        </td>
+                        <td th:text="${student.totalQuizzesTaken ?: 0}">0</td>
+                        <td>
+                            <span class="stats-badge"
+                                  th:classappend="${student.averageScore > 80} ? 'stats-high' : (${student.averageScore > 60} ? 'stats-medium' : 'stats-low')"
+                                  th:text="${student.averageScore != null ? #numbers.formatDecimal(student.averageScore, 1, 1) + '%' : '0%'}">0%</span>
+                        </td>
+                        <td>
+                            <span class="stats-badge"
+                                  th:classappend="${student.quizStreak > 5} ? 'stats-high' : (${student.quizStreak > 2} ? 'stats-medium' : 'stats-low')"
+                                  th:text="${student.quizStreak ?: 0}">0</span>
+                        </td>
+                        <td>
+                            <a href="#" class="btn btn-secondary" onclick="alert('Student details feature coming soon!')">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
